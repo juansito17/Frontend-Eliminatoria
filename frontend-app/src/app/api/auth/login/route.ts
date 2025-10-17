@@ -4,10 +4,9 @@ export async function POST(req: NextRequest) {
   try {
     const { username, password } = await req.json();
 
-    // Replace with your actual backend API URL
-    const backendApiUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3000/api/auth/login';
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3000';
 
-    const response = await fetch(backendApiUrl, {
+    const response = await fetch(`${backendUrl}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

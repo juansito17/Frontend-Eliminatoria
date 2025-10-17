@@ -1,0 +1,152 @@
+import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+
+export interface LaborAgricola {
+  id: number;
+  fecha: string;
+  cultivo: string;
+  lote: string;
+  trabajador: string;
+  tipoLabor: string;
+  cantidadRecolectada: number;
+  peso: number;
+  hora: string;
+  ubicacionGPS?: string;
+}
+
+export interface Cultivo {
+  id: number;
+  nombre: string;
+}
+
+export interface Trabajador {
+  id: number;
+  nombre: string;
+}
+
+export interface TipoLabor {
+  id: number;
+  nombre: string;
+}
+
+export function useLaboresAgricolas() {
+  const { token } = useAuth();
+  const [labores, setLabores] = useState<LaborAgricola[]>([]);
+  const [cultivos, setCultivos] = useState<Cultivo[]>([]);
+  const [trabajadores, setTrabajadores] = useState<Trabajador[]>([]);
+  const [tiposLabor, setTiposLabor] = useState<TipoLabor[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const itemsPerPage = 10;
+
+  const loadLabores = async () => {
+    if (!token) return;
+
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/labores-agricolas?page=${currentPage}&limit=${itemsPerPage}&search=${searchTerm}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setLabores(data.labores || []);
+        setTotalPages(data.totalPages || 1);
+      }
+    } catch (error) {
+      console.error('Error loading labores:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadCultivos = async () => {
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/cultivos', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCultivos(data.cultivos || []);
+      }
+    } catch (error) {
+      console.error('Error loading cultivos:', error);
+    }
+  };
+
+  const loadTrabajadores = async () => {
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/trabajadores', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setTrabajadores(data.trabajadores || []);
+      }
+    } catch (error) {
+      console.error('Error loading trabajadores:', error);
+    }
+  };
+
+  const loadTiposLabor = async () => {
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/labores-tipos', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setTiposLabor(data.tiposLabor || []);
+      }
+    } catch (error) {
+      console.error('Error loading tipos de labor:', error);
+    }
+  };
+
+  useEffect(() => {
+    loadLabores();
+  }, [currentPage, searchTerm, token]);
+
+  useEffect(() => {
+    loadCultivos();
+    loadTrabajadores();
+    loadTiposLabor();
+  }, [token]);
+
+  return {
+    labores,
+    cultivos,
+    trabajadores,
+    tiposLabor,
+    isLoading,
+    currentPage,
+    totalPages,
+    searchTerm,
+    setCurrentPage,
+    setSearchTerm,
+    loadLabores,
+    setLabores
+  };
+}
