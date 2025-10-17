@@ -18,17 +18,17 @@ export default function LaboresFilters({ searchTerm, onSearchChange, cultivos, t
           placeholder="Buscar por trabajador, cultivo o lote..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 placeholder-gray-500"
         />
       </div>
       <div className="flex gap-2">
-        <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+        <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-900">
           <option value="">Todos los cultivos</option>
           {cultivos.map(cultivo => (
             <option key={cultivo.id} value={cultivo.id}>{cultivo.nombre}</option>
           ))}
         </select>
-        <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+        <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-900">
           <option value="">Todos los tipos</option>
           {tiposLabor.map(tipo => (
             <option key={tipo.id} value={tipo.id}>{tipo.nombre}</option>

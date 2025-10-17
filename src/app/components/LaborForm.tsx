@@ -56,7 +56,7 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, o
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-white/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
@@ -83,7 +83,7 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, o
                   type="date"
                   value={formData.fecha}
                   onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
                   required
                 />
               </div>
@@ -96,7 +96,7 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, o
                   type="time"
                   value={formData.hora}
                   onChange={(e) => setFormData({ ...formData, hora: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
                   required
                 />
               </div>
@@ -110,7 +110,7 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, o
                 <select
                   value={formData.cultivoId}
                   onChange={(e) => setFormData({ ...formData, cultivoId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
                   required
                 >
                   <option value="">Seleccionar cultivo</option>
@@ -128,7 +128,7 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, o
                   type="text"
                   value={formData.lote}
                   onChange={(e) => setFormData({ ...formData, lote: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900 placeholder-gray-500"
                   placeholder="Ej: Lote A1"
                   required
                 />
@@ -143,7 +143,7 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, o
                 <select
                   value={formData.trabajadorId}
                   onChange={(e) => setFormData({ ...formData, trabajadorId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
                   required
                 >
                   <option value="">Seleccionar trabajador</option>
@@ -160,7 +160,7 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, o
                 <select
                   value={formData.tipoLaborId}
                   onChange={(e) => setFormData({ ...formData, tipoLaborId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
                   required
                 >
                   <option value="">Seleccionar tipo</option>
@@ -180,7 +180,7 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, o
                   type="number"
                   value={formData.cantidadRecolectada}
                   onChange={(e) => setFormData({ ...formData, cantidadRecolectada: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900 placeholder-gray-500"
                   placeholder="0"
                   min="0"
                   step="0.01"
@@ -196,7 +196,7 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, o
                   type="number"
                   value={formData.peso}
                   onChange={(e) => setFormData({ ...formData, peso: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900 placeholder-gray-500"
                   placeholder="0.00"
                   min="0"
                   step="0.01"
@@ -214,7 +214,7 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, o
                   type="text"
                   value={formData.ubicacionGPS}
                   onChange={(e) => setFormData({ ...formData, ubicacionGPS: e.target.value })}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900 placeholder-gray-500"
                   placeholder="Latitud, Longitud"
                 />
                 <button

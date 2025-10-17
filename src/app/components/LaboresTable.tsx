@@ -25,33 +25,33 @@ export default function LaboresTable({ labores, isLoading, onEdit, onDelete }: L
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-100">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Fecha
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Cultivo
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Lote
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Trabajador
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Tipo Labor
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Cantidad
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Peso (kg)
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Hora
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Acciones
               </th>
             </tr>
@@ -84,18 +84,20 @@ export default function LaboresTable({ labores, isLoading, onEdit, onDelete }: L
                   {labor.hora}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button
-                    onClick={() => onEdit(labor)}
-                    className="text-blue-600 hover:text-blue-900 mr-3 transition-colors"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => onDelete(labor.id)}
-                    className="text-red-600 hover:text-red-900 transition-colors"
-                  >
-                    Eliminar
-                  </button>
+                  <div className="flex justify-end space-x-2">
+                    <button
+                      onClick={() => onEdit(labor)}
+                      className="bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 px-3 py-1 rounded-md text-xs font-medium transition-colors border border-blue-200"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => onDelete(labor.id)}
+                      className="bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 px-3 py-1 rounded-md text-xs font-medium transition-colors border border-red-200"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

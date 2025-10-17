@@ -177,6 +177,12 @@ function DashboardContent() {
             </div>
             <div className="flex items-center space-x-4">
               <a
+                href="/cultivos"
+                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              >
+                Gestión de Cultivos
+              </a>
+              <a
                 href="/labores-agricolas"
                 className="text-sm text-blue-600 hover:text-blue-800 font-medium"
               >
