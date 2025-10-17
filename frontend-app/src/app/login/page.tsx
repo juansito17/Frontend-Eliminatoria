@@ -126,7 +126,13 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <div className="text-center">
+        <div className="text-center space-y-2">
+          <p className="text-sm text-gray-600">
+            ¿No tienes una cuenta?{' '}
+            <a href="/registro" className="font-medium text-green-600 hover:text-green-500 transition-colors">
+              Crear cuenta
+            </a>
+          </p>
           <p className="text-sm text-gray-600">
             ¿Problemas para acceder?{' '}
             <a href="#" className="font-medium text-green-600 hover:text-green-500 transition-colors">
