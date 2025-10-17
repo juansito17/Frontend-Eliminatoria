@@ -2,13 +2,82 @@
 
 import { useAuth } from '../context/AuthContext';
 import ProtectedRoute from '../components/ProtectedRoute';
+import React, { useEffect, useState } from 'react';
+import io from 'socket.io-client';
+
+interface DashboardData {
+  total_peso_kg: number;
+  trabajadores_activos: number;
+  cultivos_activos: number;
+  eficiencia_porcentaje: number;
+}
 
 function DashboardContent() {
   const { user, logout } = useAuth();
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await fetch('/api/dashboard');
+        if (!response.ok) {
+          throw new Error('Error al obtener los datos del dashboard');
+        }
+        const data = await response.json();
+        setDashboardData(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+
+    // Socket.io connection for real-time updates
+    const socket = io(process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3001');
+
+    socket.on('connect', () => {
+      console.log('Conectado al servidor de Socket.io');
+    });
+
+    socket.on('nueva-produccion-diaria', (data: any) => { // TODO: Define a proper interface for this data
+      console.log('Nueva producción diaria recibida:', data);
+      fetchDashboardData(); // Recargar datos al recibir una actualización
+    });
+
+    socket.on('actualizacion-produccion-diaria', (data: any) => { // TODO: Define a proper interface for this data
+      console.log('Actualización de producción diaria recibida:', data);
+      fetchDashboardData(); // Recargar datos al recibir una actualización
+    });
+
+    socket.on('eliminacion-produccion-diaria', (data: any) => { // TODO: Define a proper interface for this data
+      console.log('Eliminación de producción diaria recibida:', data);
+      fetchDashboardData(); // Recargar datos al recibir una actualización
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Desconectado del servidor de Socket.io');
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   const handleLogout = () => {
     logout();
   };
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Cargando dashboard...</div>;
+  }
+
+  if (error) {
+    return <div className="min-h-screen flex items-center justify-center text-red-500">Error: {error}</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -71,7 +140,7 @@ function DashboardContent() {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Producción Diaria</p>
-                <p className="text-2xl font-bold text-gray-900">1,234 kg</p>
+                <p className="text-2xl font-bold text-gray-900">{dashboardData?.total_peso_kg || 0} kg</p>
               </div>
             </div>
           </div>
@@ -85,7 +154,7 @@ function DashboardContent() {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Trabajadores Activos</p>
-                <p className="text-2xl font-bold text-gray-900">24</p>
+                <p className="text-2xl font-bold text-gray-900">{dashboardData?.trabajadores_activos || 0}</p>
               </div>
             </div>
           </div>
@@ -99,7 +168,7 @@ function DashboardContent() {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Cultivos Activos</p>
-                <p className="text-2xl font-bold text-gray-900">8</p>
+                <p className="text-2xl font-bold text-gray-900">{dashboardData?.cultivos_activos || 0}</p>
               </div>
             </div>
           </div>
@@ -113,7 +182,7 @@ function DashboardContent() {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Eficiencia</p>
-                <p className="text-2xl font-bold text-gray-900">94.2%</p>
+                <p className="text-2xl font-bold text-gray-900">{dashboardData?.eficiencia_porcentaje || 0}%</p>
               </div>
             </div>
           </div>

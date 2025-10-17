@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import Cookies from 'js-cookie';
 
 interface User {
   id: number;
@@ -27,17 +28,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Check if user is logged in on mount
-    const storedToken = localStorage.getItem('token');
-    if (storedToken) {
-      setToken(storedToken);
-      // You could validate the token here by making an API call
-      // For now, we'll just set a basic user object
-      setUser({ id: 1, username: 'admin', role: 'admin' });
-    }
-    setIsLoading(false);
+    const checkAuth = async () => {
+      const storedToken = Cookies.get('token');
+      if (storedToken) {
+        try {
+          const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3001';
+          const response = await fetch(`${backendUrl}/api/auth/verify-token`, {
+            headers: {
+              'Authorization': `Bearer ${storedToken}`,
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setToken(storedToken);
+            setUser(data.user); // Assuming the verify-token endpoint returns user data
+          } else {
+            // Token is invalid or expired
+            Cookies.remove('token');
+            setToken(null);
+            setUser(null);
+          }
+        } catch (err) {
+          console.error('Error verifying token:', err);
+          Cookies.remove('token');
+          setToken(null);
+          setUser(null);
+        }
+      }
+      setIsLoading(false);
+    };
+
+    checkAuth();
   }, []);
 
-  const login = async (username: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
@@ -49,17 +74,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (response.ok && data.token) {
-        localStorage.setItem('token', data.token);
+        Cookies.set('token', data.token, { expires: 7 }); // Expire in 7 days
         setToken(data.token);
         setUser({
           id: data.user?.id || 1,
-          username: data.user?.username || username,
+          username: data.user?.username || email, // Assuming email can be used as username for display if no username is returned
           role: data.user?.role || 'user'
         });
         return true;
@@ -76,7 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    Cookies.remove('token');
     setToken(null);
     setUser(null);
     setError(null);
