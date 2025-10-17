@@ -4,19 +4,53 @@ import { useAuth } from '../context/AuthContext';
 import ProtectedRoute from '../components/ProtectedRoute';
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface DashboardData {
   total_peso_kg: number;
   trabajadores_activos: number;
   cultivos_activos: number;
   eficiencia_porcentaje: number;
+  rendimiento_por_lote: { nombre_lote: string; peso_total_lote: number }[];
+  costo_total_aproximado: number;
+}
+
+interface HistoricalData {
+  periodo: string;
+  total_peso_kg: number;
+  trabajadores_unicos: number;
+  productividad_promedio_dia: number;
+  costo_total_aproximado: number;
 }
 
 function DashboardContent() {
   const { user, logout } = useAuth();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [historicalData, setHistoricalData] = useState<HistoricalData[]>([]);
+  const [selectedPeriod, setSelectedPeriod] = useState<'diario' | 'semanal' | 'mensual'>('semanal');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [alerts, setAlerts] = useState<any[]>([]); // Estado para las alertas
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -34,7 +68,22 @@ function DashboardContent() {
       }
     };
 
+    const fetchHistoricalData = async () => {
+      try {
+        const response = await fetch(`/api/dashboard/historical?periodo=${selectedPeriod}`);
+        if (!response.ok) {
+          throw new Error('Error al obtener datos históricos');
+        }
+        const data = await response.json();
+        setHistoricalData(data);
+      } catch (err: any) {
+        console.error('Error fetching historical data:', err);
+        // setError(err.message); // Podrías manejar este error por separado si quieres
+      }
+    };
+
     fetchDashboardData();
+    fetchHistoricalData();
 
     // Socket.io connection for real-time updates
     const socket = io(process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3001');
@@ -43,19 +92,24 @@ function DashboardContent() {
       console.log('Conectado al servidor de Socket.io');
     });
 
-    socket.on('nueva-produccion-diaria', (data: any) => { // TODO: Define a proper interface for this data
+    socket.on('nueva-produccion-diaria', (data: any) => {
       console.log('Nueva producción diaria recibida:', data);
       fetchDashboardData(); // Recargar datos al recibir una actualización
     });
 
-    socket.on('actualizacion-produccion-diaria', (data: any) => { // TODO: Define a proper interface for this data
+    socket.on('actualizacion-produccion-diaria', (data: any) => {
       console.log('Actualización de producción diaria recibida:', data);
       fetchDashboardData(); // Recargar datos al recibir una actualización
     });
 
-    socket.on('eliminacion-produccion-diaria', (data: any) => { // TODO: Define a proper interface for this data
+    socket.on('eliminacion-produccion-diaria', (data: any) => {
       console.log('Eliminación de producción diaria recibida:', data);
       fetchDashboardData(); // Recargar datos al recibir una actualización
+    });
+
+    socket.on('nueva-alerta', (newAlert: any) => {
+      console.log('Nueva alerta recibida:', newAlert);
+      setAlerts((prevAlerts) => [...prevAlerts, newAlert]);
     });
 
     socket.on('disconnect', () => {
@@ -65,10 +119,35 @@ function DashboardContent() {
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [selectedPeriod]); // Dependencia para recargar datos históricos cuando cambie el período
 
   const handleLogout = () => {
     logout();
+  };
+
+  const chartData = {
+    labels: historicalData.map((data) => data.periodo),
+    datasets: [
+      {
+        label: 'Producción Total (kg)',
+        data: historicalData.map((data) => data.total_peso_kg),
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: 'Producción Histórica',
+      },
+    },
   };
 
   if (loading) {
@@ -186,50 +265,104 @@ function DashboardContent() {
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Actividad Reciente</h3>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <svg className="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Nueva labor agrícola registrada</p>
-                  <p className="text-xs text-gray-600">Hace 5 minutos</p>
-                </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="p-3 bg-red-100 rounded-lg">
+                <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c1.657 0 3 .895 3 2s-1.343 2-3 2-3 .895-3 2 1.343 2 3 2m0-8c1.11 0 2.08.402 2.592 1M12 8c-1.11 0-2.08.402-2.592 1m2.592-1V3m0 2c0 2.21-1.79 4-4 4H12c2.21 0 4-1.79 4-4v2z" />
+                </svg>
               </div>
-              <div className="flex items-center space-x-3">
-                <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <svg className="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Alerta de riego generada</p>
-                  <p className="text-xs text-gray-600">Hace 15 minutos</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="h-8 w-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                  <svg className="h-4 w-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Mantenimiento de cultivo completado</p>
-                  <p className="text-xs text-gray-600">Hace 1 hora</p>
-                </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Costo Total Aprox.</p>
+                <p className="text-2xl font-bold text-gray-900">${dashboardData?.costo_total_aproximado || 0}</p>
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        {/* Rendimiento por Lote */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Rendimiento por Lote (Hoy)</h3>
+          {dashboardData?.rendimiento_por_lote && dashboardData.rendimiento_por_lote.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Lote
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Peso Total (kg)
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {dashboardData.rendimiento_por_lote.map((item, index) => (
+                    <tr key={index}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {item.nombre_lote}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {item.peso_total_lote.toFixed(2)} kg
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">No hay datos de rendimiento por lote para hoy.</p>
+          )}
+        </div>
+
+        {/* Producción Histórica */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Producción Histórica</h3>
+          <div className="flex justify-end mb-4">
+            <select
+              value={selectedPeriod}
+              onChange={(e) => setSelectedPeriod(e.target.value as 'diario' | 'semanal' | 'mensual')}
+              className="mt-1 block w-40 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            >
+              <option value="diario">Diario</option>
+              <option value="semanal">Semanal</option>
+              <option value="mensual">Mensual</option>
+            </select>
+          </div>
+          {historicalData.length > 0 ? (
+            <Line data={chartData} options={chartOptions} />
+          ) : (
+            <p className="text-sm text-gray-500">No hay datos históricos disponibles.</p>
+          )}
+        </div>
+
+        {/* Alerts Section */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Alertas</h3>
+          {alerts.length > 0 ? (
+            <div className="space-y-4">
+              {alerts.map((alert, index) => (
+                <div key={index} className="flex items-center space-x-3 p-3 bg-red-50 rounded-lg border border-red-200">
+                  <div className="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center">
+                    <svg className="h-4 w-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-red-900">{alert.tipo_alerta}: {alert.descripcion}</p>
+                    <p className="text-xs text-red-600">Nivel: {alert.nivel_severidad}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">No hay alertas activas.</p>
+          )}
+        </div>
+
+        {/* Acciones Rápidas */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Acciones Rápidas</h3>
             <div className="grid grid-cols-2 gap-4">
               <a href="/labores-agricolas" className="p-4 bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 rounded-lg border border-green-200 transition-all duration-200 group">
@@ -240,14 +373,14 @@ function DashboardContent() {
                   <span className="text-sm font-medium text-green-800">Nueva Labor</span>
                 </div>
               </a>
-              <button className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-lg border border-blue-200 transition-all duration-200 group">
+              <a href="/api/reportes/labores/excel" target="_blank" rel="noopener noreferrer" className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-lg border border-blue-200 transition-all duration-200 group">
                 <div className="flex flex-col items-center text-center">
                   <svg className="h-8 w-8 text-blue-600 mb-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                   <span className="text-sm font-medium text-blue-800">Ver Reportes</span>
                 </div>
-              </button>
+              </a>
               <button className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 rounded-lg border border-purple-200 transition-all duration-200 group">
                 <div className="flex flex-col items-center text-center">
                   <svg className="h-8 w-8 text-purple-600 mb-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -266,7 +399,6 @@ function DashboardContent() {
               </button>
             </div>
           </div>
-        </div>
       </main>
     </div>
   );
