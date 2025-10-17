@@ -188,7 +188,7 @@ function DashboardContent() {
               >
                 Gestión de Labores
               </a>
-              <span className="text-sm text-gray-700">Hola, {user?.username}</span>
+              <span className="text-sm text-gray-700">Hola, {user?.username || 'Usuario'}</span>
               <button
                 onClick={handleLogout}
                 className="p-2 text-gray-400 hover:text-red-600 transition-colors"

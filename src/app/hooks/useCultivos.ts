@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useAuth } from '../context/AuthContext'; // Importar useAuth
 
 export interface Cultivo {
   id_cultivo: number;
@@ -23,6 +24,7 @@ export interface UseCultivosReturn {
 }
 
 export const useCultivos = (): UseCultivosReturn => {
+  const { token } = useAuth(); // Obtener el token del contexto de autenticación
   const [cultivos, setCultivos] = useState<Cultivo[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +34,11 @@ export const useCultivos = (): UseCultivosReturn => {
     setError(null);
 
     try {
-      const response = await fetch('/api/cultivos');
+      const response = await fetch('/api/cultivos', {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Incluir el token en el encabezado
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`Error HTTP: ${response.status}`);
@@ -57,6 +63,7 @@ export const useCultivos = (): UseCultivosReturn => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Incluir el token en el encabezado
         },
         body: JSON.stringify(data),
       });
@@ -86,6 +93,7 @@ export const useCultivos = (): UseCultivosReturn => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Incluir el token en el encabezado
         },
         body: JSON.stringify(data),
       });
@@ -113,6 +121,9 @@ export const useCultivos = (): UseCultivosReturn => {
     try {
       const response = await fetch(`/api/cultivos/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`, // Incluir el token en el encabezado
+        },
       });
 
       if (!response.ok) {

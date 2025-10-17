@@ -111,7 +111,7 @@ function LaboresAgricolasContent() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">Hola, {user?.username}</span>
+              <span className="text-sm text-gray-700">Hola, {user?.username || 'Usuario'}</span>
               <button
                 onClick={() => setShowModal(true)}
                 className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-green-700 hover:to-blue-700 transition-all duration-200 flex items-center"
