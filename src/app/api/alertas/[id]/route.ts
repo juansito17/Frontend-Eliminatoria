@@ -13,8 +13,9 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     }
 
     const body = await req.json();
+    const { id } = await params;
 
-    const response = await fetch(`${BACKEND_URL}/api/alertas/${params.id}`, {
+    const response = await fetch(`${BACKEND_URL}/api/alertas/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -45,7 +46,8 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
       return NextResponse.json({ message: 'No autenticado' }, { status: 401 });
     }
 
-    const response = await fetch(`${BACKEND_URL}/api/alertas/${params.id}`, {
+    const { id } = await params;
+    const response = await fetch(`${BACKEND_URL}/api/alertas/${id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token.value}`,

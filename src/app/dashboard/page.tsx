@@ -52,6 +52,14 @@ function DashboardContent() {
   const [error, setError] = useState<string | null>(null);
   const [alerts, setAlerts] = useState<any[]>([]); // Estado para las alertas
 
+  // Filtros adicionales para el dashboard
+  const [cultivos, setCultivos] = useState<{ id: number; nombre: string }[]>([]);
+  const [lotes, setLotes] = useState<{ id: number; nombre: string }[]>([]);
+  const [filtroCultivo, setFiltroCultivo] = useState<string>('');
+  const [filtroLote, setFiltroLote] = useState<string>('');
+  const [dateFrom, setDateFrom] = useState<string>('');
+  const [dateTo, setDateTo] = useState<string>('');
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
@@ -82,8 +90,35 @@ function DashboardContent() {
       }
     };
 
+    // Cargar filtros maestros
+    const fetchCultivos = async () => {
+      try {
+        const res = await fetch('/api/cultivos');
+        if (res.ok) {
+          const data = await res.json();
+          setCultivos(data.cultivos || data || []);
+        }
+      } catch (err) {
+        console.error('Error cargando cultivos:', err);
+      }
+    };
+
+    const fetchLotes = async () => {
+      try {
+        const res = await fetch('/api/lotes');
+        if (res.ok) {
+          const data = await res.json();
+          setLotes(data.lotes || data || []);
+        }
+      } catch (err) {
+        console.error('Error cargando lotes:', err);
+      }
+    };
+
     fetchDashboardData();
     fetchHistoricalData();
+    fetchCultivos();
+    fetchLotes();
 
     // Socket.io connection for real-time updates
     const socket = io(process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3001');

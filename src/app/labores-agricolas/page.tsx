@@ -12,7 +12,7 @@ import { useConfirm } from '../components/ConfirmModal';
 import { useToast } from '../components/Toast';
 
 function LaboresAgricolasContent() {
-  const { user, logout } = useAuth();
+  const { user, logout, token } = useAuth();
   const {
     labores,
     cultivos,
@@ -42,7 +42,7 @@ function LaboresAgricolasContent() {
 
   const handleSubmit = async (formData: any) => {
     try {
-      const token = localStorage.getItem('token');
+      const authToken = token || '';
       const url = editingLabor
         ? `/api/labores-agricolas/${editingLabor.id}`
         : '/api/labores-agricolas';
@@ -52,7 +52,7 @@ function LaboresAgricolasContent() {
       const response = await fetch(url, {
         method,
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${authToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
@@ -83,11 +83,11 @@ function LaboresAgricolasContent() {
     if (!confirmed) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const authToken = token || '';
       const response = await fetch(`/api/labores-agricolas/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${authToken}`,
           'Content-Type': 'application/json',
         },
       });
