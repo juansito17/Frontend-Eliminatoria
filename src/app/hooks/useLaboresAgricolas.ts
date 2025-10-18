@@ -26,8 +26,12 @@ export interface Trabajador {
 }
 
 export interface TipoLabor {
-  id: number;
-  nombre: string;
+  id_labor_tipo: number;
+  nombre_labor: string;
+  descripcion_labor?: string;
+  requiere_cantidad: boolean;
+  requiere_peso: boolean;
+  fecha_creacion: string;
 }
 
 export interface Lote {

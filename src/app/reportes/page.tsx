@@ -96,8 +96,12 @@ interface Trabajador {
 }
 
 interface LaborTipo {
-  id: number;
-  nombre: string;
+  id_labor_tipo: number;
+  nombre_labor: string;
+  descripcion_labor?: string;
+  requiere_cantidad: boolean;
+  requiere_peso: boolean;
+  fecha_creacion: string;
 }
 
 function ReportesContent() {
@@ -521,8 +525,8 @@ function ReportesContent() {
               >
                 <option className="text-black" value="">Todos</option>
                 {tiposLabor.map(tipo => (
-                  <option className="text-black" key={tipo.id} value={tipo.id.toString()}>
-                    {tipo.nombre}
+                  <option className="text-black" key={tipo.id_labor_tipo} value={tipo.id_labor_tipo.toString()}>
+                    {tipo.nombre_labor}
                   </option>
                 ))}
               </select>
@@ -683,7 +687,7 @@ function ReportesContent() {
                 <button
                   onClick={() => handleFiltroChange('page', (pagination.page - 1).toString())}
                   disabled={pagination.page <= 1}
-                  className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100"
                 >
                   Anterior
                 </button>
@@ -693,7 +697,7 @@ function ReportesContent() {
                 <button
                   onClick={() => handleFiltroChange('page', (pagination.page + 1).toString())}
                   disabled={pagination.page >= pagination.pages}
-                  className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100"
                 >
                   Siguiente
                 </button>

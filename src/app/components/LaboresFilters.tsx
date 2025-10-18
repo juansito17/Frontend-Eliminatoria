@@ -52,7 +52,7 @@ export default function LaboresFilters({
         >
           <option className="text-black" value="">Todos los tipos</option>
           {tiposLabor.map(tipo => (
-            <option className="text-black" key={tipo.id} value={tipo.id}>{tipo.nombre}</option>
+            <option className="text-black" key={tipo.id_labor_tipo} value={tipo.id_labor_tipo}>{tipo.nombre_labor}</option>
           ))}
         </select>
       </div>
