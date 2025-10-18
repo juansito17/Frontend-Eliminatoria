@@ -4,7 +4,6 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import ProtectedRoute from '../components/ProtectedRoute';
 import io from 'socket.io-client';
-import DashboardHeader from './components/DashboardHeader';
 import StatsCards from './components/StatsCards';
 import Sidebar from './components/Sidebar';
 import {
@@ -69,6 +68,19 @@ function DashboardContent() {
     }
   }, [selectedPeriod]);
 
+  const fetchAlertas = useCallback(async () => {
+    try {
+      const res = await fetch('/api/alertas');
+      if (res.ok) {
+        const data = await res.json();
+        const lista = Array.isArray(data) ? data : data.alertas || [];
+        setAlerts(lista);
+      }
+    } catch (err) {
+      console.error('Error cargando alertas:', err);
+    }
+  }, []);
+
   const fetchCultivos = useCallback(async () => {
     try {
       const res = await fetch('/api/cultivos');
@@ -96,7 +108,8 @@ function DashboardContent() {
   useEffect(() => {
     fetchDashboardData();
     fetchHistoricalData();
-    fetchCultivos();
+  fetchCultivos();
+  fetchAlertas();
     fetchLotes();
 
     const socket = io(process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3001');
@@ -123,7 +136,15 @@ function DashboardContent() {
 
     socket.on('nueva-alerta', (newAlert: any) => {
       console.log('Nueva alerta recibida:', newAlert);
-      setAlerts((prev) => [...prev, newAlert]);
+      setAlerts((prev) => [newAlert, ...prev]);
+    });
+
+    socket.on('actualizacion-alerta', (alertaActualizada: any) => {
+      setAlerts((prev) => prev.map(a => a.id === alertaActualizada.id ? alertaActualizada : a));
+    });
+
+    socket.on('eliminacion-alerta', ({ id }: { id: number }) => {
+      setAlerts((prev) => prev.filter(a => a.id !== id));
     });
 
     const polling = setInterval(() => {
@@ -139,7 +160,7 @@ function DashboardContent() {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [fetchDashboardData, fetchHistoricalData, fetchCultivos, fetchLotes]);
+  }, [fetchDashboardData, fetchHistoricalData, fetchCultivos, fetchLotes, fetchAlertas]);
 
   const handleLogout = () => logout();
 
@@ -155,8 +176,6 @@ function DashboardContent() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Sidebar rol={user?.rol} username={user?.username} />
       <div className="ml-16 md:ml-64">
-        <DashboardHeader user={user} onLogout={handleLogout} />
-
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">¡Bienvenido de vuelta!</h2>
