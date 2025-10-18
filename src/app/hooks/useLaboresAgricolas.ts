@@ -30,6 +30,11 @@ export interface TipoLabor {
   nombre: string;
 }
 
+export interface Lote {
+  id: number;
+  nombre: string;
+}
+
 export function useLaboresAgricolas() {
   const { token } = useAuth();
 
@@ -37,6 +42,7 @@ export function useLaboresAgricolas() {
   const [cultivos, setCultivos] = useState<Cultivo[]>([]);
   const [trabajadores, setTrabajadores] = useState<Trabajador[]>([]);
   const [tiposLabor, setTiposLabor] = useState<TipoLabor[]>([]);
+  const [lotes, setLotes] = useState<Lote[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -136,6 +142,27 @@ export function useLaboresAgricolas() {
     }
   };
 
+  const loadLotes = async () => {
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/lotes', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Esperamos { lotes: [...] } o directamente array
+        setLotes(data.lotes || data || []);
+      }
+    } catch (error) {
+      console.error('Error loading lotes:', error);
+    }
+  };
+
   useEffect(() => {
     setCurrentPage(1); // Reiniciar a la primera página cuando cambian los filtros
   }, [searchTerm, filtroCultivo, filtroTipoLabor]);
@@ -148,6 +175,7 @@ export function useLaboresAgricolas() {
     loadCultivos();
     loadTrabajadores();
     loadTiposLabor();
+    loadLotes();
   }, [token]);
 
   return {
@@ -155,6 +183,7 @@ export function useLaboresAgricolas() {
     cultivos,
     trabajadores,
     tiposLabor,
+    lotes,
     isLoading,
     currentPage,
     totalPages,
@@ -166,6 +195,8 @@ export function useLaboresAgricolas() {
     filtroTipoLabor,
     setFiltroTipoLabor,
     loadLabores,
-    setLabores
+    setLabores,
+    loadLotes,
+    setLotes
   };
 }

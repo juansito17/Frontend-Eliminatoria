@@ -16,6 +16,7 @@ function LaboresAgricolasContent() {
     cultivos,
     trabajadores,
     tiposLabor,
+    lotes,
     isLoading,
     currentPage,
     totalPages,
@@ -27,7 +28,8 @@ function LaboresAgricolasContent() {
     filtroTipoLabor,
     setFiltroTipoLabor,
     loadLabores,
-    setLabores
+    setLabores,
+    loadLotes
   } = useLaboresAgricolas();
 
   const [showModal, setShowModal] = useState(false);
@@ -167,6 +169,7 @@ function LaboresAgricolasContent() {
           cultivos={cultivos}
           trabajadores={trabajadores}
           tiposLabor={tiposLabor}
+          lotes={lotes}
           onSubmit={handleSubmit}
           onCancel={() => {
             setShowModal(false);

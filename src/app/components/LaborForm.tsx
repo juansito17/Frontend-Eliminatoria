@@ -1,25 +1,31 @@
 'use client';
 
-import { useState } from 'react';
-import { LaborAgricola, Cultivo, Trabajador, TipoLabor } from '../hooks/useLaboresAgricolas';
+import { useState, useEffect } from 'react';
+import { LaborAgricola } from '../hooks/useLaboresAgricolas';
+
+interface Cultivo { id: number; nombre: string; }
+interface Trabajador { id: number; nombre: string; }
+interface TipoLabor { id: number; nombre: string; }
+interface Lote { id: number; nombre: string; }
 
 interface LaborFormProps {
   labor?: LaborAgricola | null;
   cultivos: Cultivo[];
   trabajadores: Trabajador[];
   tiposLabor: TipoLabor[];
+  lotes: Lote[];
   onSubmit: (data: any) => Promise<void>;
   onCancel: () => void;
 }
 
-export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, onSubmit, onCancel }: LaborFormProps) {
+export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, lotes, onSubmit, onCancel }: LaborFormProps) {
 
   const [formData, setFormData] = useState({
-    fecha: labor?.fecha || new Date().toISOString().split('T')[0],
-    cultivoId: labor?.cultivo || '',
-    lote: labor?.lote || '',
-    trabajadorId: labor?.trabajador || '',
-    tipoLaborId: labor?.tipoLabor || '',
+    fecha: labor?.fecha ? (labor.fecha.split('T')?.[0] || new Date().toISOString().split('T')[0]) : new Date().toISOString().split('T')[0],
+    cultivoId: '',
+    loteId: '',
+    trabajadorId: '',
+    tipoLaborId: '',
     cantidadRecolectada: labor?.cantidadRecolectada?.toString() || '',
     peso: labor?.peso?.toString() || '',
     hora: labor?.hora || new Date().toTimeString().slice(0, 5),
@@ -28,12 +34,65 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, o
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Cuando cambian labor o listas maestro, intentar mapear nombres a IDs para edición
+  useEffect(() => {
+    if (!labor) return;
+
+    // cultivar
+    let cultivoId = '';
+    const cultivoMatch = cultivos.find(c => c.nombre === (labor.cultivo || ''));
+    if (cultivoMatch) cultivoId = String(cultivoMatch.id);
+
+    // trabajador
+    let trabajadorId = '';
+    const trabajadorMatch = trabajadores.find(t => t.nombre === (labor.trabajador || ''));
+    if (trabajadorMatch) trabajadorId = String(trabajadorMatch.id);
+
+    // tipo labor
+    let tipoLaborId = '';
+    const tipoMatch = tiposLabor.find(t => t.nombre === (labor.tipoLabor || ''));
+    if (tipoMatch) tipoLaborId = String(tipoMatch.id);
+
+    // lote
+    let loteId = '';
+    const loteMatch = lotes.find(l => l.nombre === (labor.lote || ''));
+    if (loteMatch) loteId = String(loteMatch.id);
+
+    setFormData({
+      fecha: labor.fecha ? (labor.fecha.split('T')?.[0] || formData.fecha) : formData.fecha,
+      cultivoId: cultivoId || formData.cultivoId,
+      loteId: loteId || formData.loteId,
+      trabajadorId: trabajadorId || formData.trabajadorId,
+      tipoLaborId: tipoLaborId || formData.tipoLaborId,
+      cantidadRecolectada: labor?.cantidadRecolectada?.toString() || formData.cantidadRecolectada,
+      peso: labor?.peso?.toString() || formData.peso,
+      hora: labor.hora || formData.hora,
+      ubicacionGPS: labor?.ubicacionGPS || formData.ubicacionGPS
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [labor, cultivos, trabajadores, tiposLabor, lotes]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      await onSubmit(formData);
+      // Construir payload acorde al backend
+      const payload: any = {
+        id_lote: formData.loteId ? parseInt(formData.loteId) : null,
+        id_cultivo: formData.cultivoId ? parseInt(formData.cultivoId) : null,
+        id_trabajador: formData.trabajadorId ? parseInt(formData.trabajadorId) : null,
+        id_labor_tipo: formData.tipoLaborId ? parseInt(formData.tipoLaborId) : null,
+        // Unir fecha + hora en formato DATETIME simple
+        fecha_labor: `${formData.fecha} ${formData.hora}:00`,
+        cantidad_recolectada: formData.cantidadRecolectada ? parseFloat(formData.cantidadRecolectada) : null,
+        peso_kg: formData.peso ? parseFloat(formData.peso) : null,
+        costo_aproximado: null,
+        ubicacion_gps_punto: formData.ubicacionGPS ? formData.ubicacionGPS : null,
+        observaciones: ''
+      };
+
+      await onSubmit(payload);
     } finally {
       setIsSubmitting(false);
     }
@@ -125,14 +184,17 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, o
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Lote
                 </label>
-                <input
-                  type="text"
-                  value={formData.lote}
-                  onChange={(e) => setFormData({ ...formData, lote: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900 placeholder-gray-500"
-                  placeholder="Ej: Lote A1"
+                <select
+                  value={formData.loteId}
+                  onChange={(e) => setFormData({ ...formData, loteId: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
                   required
-                />
+                >
+                  <option value="">Seleccionar lote</option>
+                  {lotes.map(lote => (
+                    <option key={lote.id} value={lote.id}>{lote.nombre}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
