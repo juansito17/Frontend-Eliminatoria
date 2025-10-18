@@ -32,8 +32,9 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+      console.error('Error del backend al obtener lotes:', errorData);
       return NextResponse.json(
-        { message: errorData.message || 'Error al obtener lotes' },
+        { message: errorData.message || 'Error al obtener lotes', backendError: errorData },
         { status: response.status }
       );
     }

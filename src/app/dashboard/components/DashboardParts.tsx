@@ -38,6 +38,8 @@ export interface DashboardData {
   eficiencia_porcentaje: number;
   rendimiento_por_lote: RendimientoItem[];
   costo_total_aproximado: number;
+  fecha_datos?: string;
+  usando_datos_anteriores?: boolean;
 }
 
 export interface HistoricalData {
