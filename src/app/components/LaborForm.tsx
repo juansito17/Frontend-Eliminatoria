@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { LaborAgricola } from '../hooks/useLaboresAgricolas';
 import { useToast } from './Toast';
+import { useAuth } from '../context/AuthContext';
 
 interface Cultivo { id: number; nombre: string; }
 interface Trabajador { id: number; nombre: string; }
@@ -35,12 +36,21 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, l
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [locating, setLocating] = useState(false);
+  const [trabajadorSearch, setTrabajadorSearch] = useState('');
 
   const { showToast } = useToast();
+  const { user } = useAuth();
 
-  // Cuando cambian labor o listas maestro, intentar mapear nombres a IDs para edición
+  // Cuando cambian labor o listas maestro, intentar mapear nombres a IDs para edición y ajustar por rol
   useEffect(() => {
-    if (!labor) return;
+    if (!labor) {
+      // Si no hay labor (crear nuevo), para operario asignar su trabajador si está disponible
+      // Asignar si hay al menos 1 trabajador (no exigir exactamente 1)
+      if (user?.rol === 3 && trabajadores.length > 0) {
+        setFormData(prev => ({ ...prev, trabajadorId: String(trabajadores[0].id) }));
+      }
+      return;
+    }
 
     // cultivar
     let cultivoId = '';
@@ -51,6 +61,10 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, l
     let trabajadorId = '';
     const trabajadorMatch = trabajadores.find(t => t.nombre === (labor.trabajador || ''));
     if (trabajadorMatch) trabajadorId = String(trabajadorMatch.id);
+    // Si el usuario es operario y hay un trabajador en lista, forzarlo
+    if (user?.rol === 3 && trabajadores.length === 1) {
+      trabajadorId = String(trabajadores[0].id);
+    }
 
     // tipo labor
     let tipoLaborId = '';
@@ -74,7 +88,7 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, l
       ubicacionGPS: labor?.ubicacionGPS || formData.ubicacionGPS
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [labor, cultivos, trabajadores, tiposLabor, lotes]);
+  }, [labor, cultivos, trabajadores, tiposLabor, lotes, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -243,17 +257,65 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, l
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Trabajador
                 </label>
-                <select
-                  value={formData.trabajadorId}
-                  onChange={(e) => setFormData({ ...formData, trabajadorId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
-                  required
-                >
-                  <option value="">Seleccionar trabajador</option>
-                  {trabajadores.map(trabajador => (
-                    <option key={trabajador.id} value={trabajador.id}>{trabajador.nombre}</option>
-                  ))}
-                </select>
+
+                {user?.rol === 3 ? (
+                  <div>
+                    <input
+                      type="text"
+                      value={trabajadores[0]?.nombre || user?.username || 'Sin trabajador asignado'}
+                      disabled
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-700"
+                    />
+                    <input type="hidden" value={formData.trabajadorId} />
+                  </div>
+                ) : (
+                  // Supervisor / Admin: search + select para mejor usabilidad con mini-avatars en opciones (visual)
+                  <>
+                    <div className="mb-2 flex gap-2">
+                      <input
+                        type="search"
+                        value={trabajadorSearch}
+                        onChange={(e) => setTrabajadorSearch(e.target.value)}
+                        placeholder="Buscar trabajador por nombre..."
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => { setTrabajadorSearch(''); setFormData(prev => ({ ...prev, trabajadorId: '' })); }}
+                        className="px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm text-gray-600 hover:bg-gray-50"
+                        title="Limpiar búsqueda"
+                      >
+                        Limpiar
+                      </button>
+                    </div>
+
+                    <div className="relative">
+                      <select
+                        value={formData.trabajadorId}
+                        onChange={(e) => setFormData({ ...formData, trabajadorId: e.target.value })}
+                        className="w-full px-3 py-2 pl-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900 appearance-none"
+                        required
+                      >
+                        <option value="">Seleccionar trabajador</option>
+                        {trabajadores
+                          .filter(t => !trabajadorSearch || t.nombre.toLowerCase().includes(trabajadorSearch.toLowerCase()))
+                          .map(trabajador => (
+                            <option key={trabajador.id} value={trabajador.id}>{trabajador.nombre}</option>
+                          ))
+                        }
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    {trabajadores.length === 0 && (
+                      <p className="mt-2 text-xs text-gray-500">No hay trabajadores disponibles para tu rol.</p>
+                    )}
+                  </>
+                )}
               </div>
 
               <div>
