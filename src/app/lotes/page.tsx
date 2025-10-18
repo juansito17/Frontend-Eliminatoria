@@ -222,8 +222,21 @@ function LotesContent() {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">{editing ? 'Editar Lote' : 'Nuevo Lote'}</h3>
               <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
                 <div className="grid md:grid-cols-2 gap-4">
-                  <input required placeholder="Nombre del lote" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} className="px-3 py-2 border rounded-md" />
-                  <input placeholder="Área (ha)" type="number" step="0.01" value={form.area} onChange={(e) => setForm({ ...form, area: e.target.value })} className="px-3 py-2 border rounded-md" />
+                  <input
+                    required
+                    placeholder="Nombre del lote"
+                    value={form.nombre}
+                    onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                    className="px-3 py-2 border rounded-md bg-white text-gray-900 placeholder-gray-400"
+                  />
+                  <input
+                    placeholder="Área (ha)"
+                    type="number"
+                    step="0.01"
+                    value={form.area}
+                    onChange={(e) => setForm({ ...form, area: e.target.value })}
+                    className="px-3 py-2 border rounded-md bg-white text-gray-900 placeholder-gray-400"
+                  />
                 </div>
 
                 <div>

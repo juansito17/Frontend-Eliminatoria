@@ -53,7 +53,10 @@ export const useLaboresTipos = () => {
         return;
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/labores-tipos`, {
+      // Aseguramos una URL base válida con fallback local (puerto 3001) y sin sufijo /api
+      const rawBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const baseUrl = rawBase.replace(/\/+$/,'').replace(/\/api\/?$/i,'');
+      const response = await fetch(`${baseUrl}/api/labores-tipos`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -89,7 +92,9 @@ export const useLaboresTipos = () => {
         return false;
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/labores-tipos`, {
+      const rawBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const baseUrl = rawBase.replace(/\/+$/,'').replace(/\/api\/?$/i,'');
+      const response = await fetch(`${baseUrl}/api/labores-tipos`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -131,7 +136,9 @@ export const useLaboresTipos = () => {
         return false;
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/labores-tipos/${data.id_labor_tipo}`, {
+      const rawBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const baseUrl = rawBase.replace(/\/+$/,'').replace(/\/api\/?$/i,'');
+      const response = await fetch(`${baseUrl}/api/labores-tipos/${data.id_labor_tipo}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -181,7 +188,9 @@ export const useLaboresTipos = () => {
         return false;
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/labores-tipos/${id}`, {
+      const rawBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const baseUrl = rawBase.replace(/\/+$/,'').replace(/\/api\/?$/i,'');
+      const response = await fetch(`${baseUrl}/api/labores-tipos/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3001';
+// Unificar variable y sanear la URL base para evitar duplicar /api
+const RAW_BACKEND = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3001';
+const BACKEND_URL = RAW_BACKEND.replace(/\/+$/,'').replace(/\/api\/?$/i,'');
 
 function mapLotePayload(body: any) {
   return {

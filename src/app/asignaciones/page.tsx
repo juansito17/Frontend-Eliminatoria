@@ -36,6 +36,9 @@ function AsignacionesContent() {
   const [labores, setLabores] = useState<Labor[]>([]);
   const [trabajadores, setTrabajadores] = useState<Trabajador[]>([]);
 
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({ id_lote: '', id_supervisor: '' });
+
   // Supervisores (rol === 2)
   const supervisores = useMemo(() => usuarios.filter(u => u.rol === 2), [usuarios]);
 
@@ -138,12 +141,21 @@ function AsignacionesContent() {
 
   return (
     <div className="space-y-6">
-      <header className="space-y-4">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Asignaciones</h1>
           <p className="mt-2 text-sm text-gray-600">Asignar supervisores a lotes y reasignar labores a trabajadores</p>
         </div>
-        <div className="flex gap-2 border-b border-gray-200">
+        <button 
+          onClick={() => { setShowModal(true); setFormData({ id_lote: '', id_supervisor: '' }); }}
+          className="px-4 py-2 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-md hover:from-green-700 hover:to-blue-700 font-medium transition-all"
+        >
+          + Agregar Asignación
+        </button>
+      </div>
+
+      <div className="border-b border-gray-200 mb-6">
+        <div className="flex gap-2">
           <button 
             onClick={() => setTab('lotes')} 
             className={`px-6 py-3 text-sm font-medium transition-colors ${
@@ -165,7 +177,7 @@ function AsignacionesContent() {
             Labores
           </button>
         </div>
-      </header>
+      </div>
 
       {tab === 'lotes' && (
         <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -313,6 +325,89 @@ function AsignacionesContent() {
             </table>
           </div>
         </section>
+      )}
+
+      {/* Modal para agregar asignación */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Agregar Asignación</h3>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (!formData.id_lote || !formData.id_supervisor) {
+                showToast('Por favor completa todos los campos', 'error');
+                return;
+              }
+              try {
+                setLoading(true);
+                const res = await fetch(`/api/lotes/${formData.id_lote}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json', ...authHeader },
+                  body: JSON.stringify({ id_supervisor: parseInt(formData.id_supervisor, 10) })
+                });
+                if (!res.ok) {
+                  const data = await res.json().catch(() => ({}));
+                  showToast(data.message || 'Error al asignar supervisor', 'error');
+                  return;
+                }
+                showToast('Asignación creada correctamente', 'success');
+                setShowModal(false);
+                await loadLotes();
+              } catch (err) {
+                console.error(err);
+                showToast('Error de conexión', 'error');
+              } finally { setLoading(false); }
+            }} className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-gray-900 block mb-2">Seleccionar Lote</label>
+                <select 
+                  value={formData.id_lote} 
+                  onChange={(e) => setFormData({ ...formData, id_lote: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500"
+                  disabled={loading}
+                >
+                  <option value="" className="text-gray-900">-- Seleccionar lote --</option>
+                  {lotes.map(l => (
+                    <option key={l.id} value={String(l.id)} className="text-gray-900">{l.nombre}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-900 block mb-2">Seleccionar Supervisor</label>
+                <select 
+                  value={formData.id_supervisor} 
+                  onChange={(e) => setFormData({ ...formData, id_supervisor: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500"
+                  disabled={loading}
+                >
+                  <option value="" className="text-gray-900">-- Seleccionar supervisor --</option>
+                  {supervisores.map(s => (
+                    <option key={s.id} value={String(s.id)} className="text-gray-900">{s.username || s.email || `Supervisor ${s.id}`}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4">
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)} 
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-900 font-medium hover:bg-gray-50"
+                  disabled={loading}
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 disabled:bg-gray-400"
+                  disabled={loading}
+                >
+                  Asignar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

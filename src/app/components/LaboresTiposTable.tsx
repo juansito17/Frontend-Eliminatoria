@@ -7,6 +7,7 @@ interface LaboresTiposTableProps {
   onEdit: (laborTipo: LaborTipo) => void;
   onDelete: (id: number) => void;
   loading?: boolean;
+  onAdd?: () => void; // callback para agregar nuevo
 }
 
 export const LaboresTiposTable: React.FC<LaboresTiposTableProps> = ({
@@ -14,6 +15,7 @@ export const LaboresTiposTable: React.FC<LaboresTiposTableProps> = ({
   onEdit,
   onDelete,
   loading = false,
+  onAdd,
 }) => {
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString('es-CO', {
@@ -34,9 +36,18 @@ export const LaboresTiposTable: React.FC<LaboresTiposTableProps> = ({
 
   if (laboresTipos.length === 0) {
     return (
-      <div className="text-center p-8 text-gray-500">
-        <p>No hay tipos de labores registrados.</p>
-        <p className="text-sm mt-1">Agrega el primero usando el botón "Agregar Tipo de Labor".</p>
+      <div className="flex flex-col items-center justify-center p-8 text-gray-600">
+        <p className="mb-3">No hay tipos de labores registrados.</p>
+        <button
+          type="button"
+          onClick={onAdd}
+          className="inline-flex items-center px-4 py-2 rounded-md text-white text-sm font-medium bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 shadow"
+        >
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Agregar Tipo de Labor
+        </button>
       </div>
     );
   }
@@ -70,8 +81,8 @@ export const LaboresTiposTable: React.FC<LaboresTiposTableProps> = ({
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {laboresTipos.map((laborTipo) => (
-            <tr key={laborTipo.id_labor_tipo} className="hover:bg-gray-50">
+          {laboresTipos.map((laborTipo, index) => (
+            <tr key={laborTipo.id_labor_tipo || index} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {laborTipo.id_labor_tipo}
               </td>
