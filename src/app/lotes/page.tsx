@@ -21,7 +21,7 @@ function LotesContent() {
   const { showToast } = useToast();
   const showConfirm = useConfirm();
 
-  const { cultivos } = useCultivos();
+  const { cultivos, fetchCultivos } = useCultivos();
 
   const [lotes, setLotes] = useState<Lote[]>([]);
   const [supervisores, setSupervisores] = useState<any[]>([]);
@@ -76,8 +76,11 @@ function LotesContent() {
   };
 
   useEffect(() => {
-    loadLotes();
-    loadSupervisores();
+    if (token) {
+      loadLotes();
+      loadSupervisores();
+      fetchCultivos();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
@@ -103,8 +106,8 @@ function LotesContent() {
 
     try {
       const payload: any = {
-        nombre: form.nombre,
-        area: form.area ? parseFloat(form.area) : null,
+        nombre_lote: form.nombre,
+        area_hectareas: form.area ? parseFloat(form.area) : null,
         id_cultivo: form.id_cultivo ? parseInt(form.id_cultivo, 10) : null,
         id_supervisor: form.id_supervisor ? parseInt(form.id_supervisor, 10) : null,
       };
@@ -217,8 +220,8 @@ function LotesContent() {
 
         {/* Modal */}
         {showModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div className="bg-white rounded-xl max-w-2xl w-full p-6">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setShowModal(false)}>
+            <div className="bg-white rounded-xl max-w-2xl w-full p-6" onClick={(e) => e.stopPropagation()}>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">{editing ? 'Editar Lote' : 'Nuevo Lote'}</h3>
               <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
                 <div className="grid md:grid-cols-2 gap-4">
@@ -227,7 +230,7 @@ function LotesContent() {
                     placeholder="Nombre del lote"
                     value={form.nombre}
                     onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-                    className="px-3 py-2 border rounded-md bg-white text-gray-900 placeholder-gray-400"
+                    className="px-3 py-2 border rounded-md bg-white text-gray-900 placeholder-gray-500"
                   />
                   <input
                     placeholder="Área (ha)"
@@ -235,13 +238,13 @@ function LotesContent() {
                     step="0.01"
                     value={form.area}
                     onChange={(e) => setForm({ ...form, area: e.target.value })}
-                    className="px-3 py-2 border rounded-md bg-white text-gray-900 placeholder-gray-400"
+                    className="px-3 py-2 border rounded-md bg-white text-gray-900 placeholder-gray-500"
                   />
                 </div>
 
                 <div>
                   <label className="text-sm text-gray-600 block mb-2">Asignar a Cultivo (opcional)</label>
-                  <select value={form.id_cultivo} onChange={(e) => setForm({ ...form, id_cultivo: e.target.value })} className="w-full px-3 py-2 border rounded-md">
+                  <select value={form.id_cultivo} onChange={(e) => setForm({ ...form, id_cultivo: e.target.value })} className="w-full px-3 py-2 border rounded-md bg-white text-gray-900">
                     <option value="">-- Ninguno --</option>
                     {cultivos.map(c => (
                       <option key={c.id} value={String(c.id)}>{c.nombre}</option>
@@ -251,7 +254,7 @@ function LotesContent() {
 
                 <div>
                   <label className="text-sm text-gray-600 block mb-2">Asignar Supervisor (opcional)</label>
-                  <select value={form.id_supervisor} onChange={(e) => setForm({ ...form, id_supervisor: e.target.value })} className="w-full px-3 py-2 border rounded-md">
+                  <select value={form.id_supervisor} onChange={(e) => setForm({ ...form, id_supervisor: e.target.value })} className="w-full px-3 py-2 border rounded-md bg-white text-gray-900">
                     <option value="">-- Ninguno --</option>
                     {supervisores.map(s => (
                       <option key={s.id} value={String(s.id)}>{s.username || s.nombre_usuario || s.email}</option>

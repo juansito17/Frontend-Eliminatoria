@@ -125,7 +125,7 @@ export const LaborTipoForm: React.FC<LaborTipoFormProps> = ({
             id="nombre_labor"
             value={formData.nombre_labor}
             onChange={(e) => handleInputChange('nombre_labor', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500 ${
               errors.nombre_labor ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="Ej: Cosecha de café, Corte de caña..."
@@ -146,7 +146,7 @@ export const LaborTipoForm: React.FC<LaborTipoFormProps> = ({
             rows={3}
             value={formData.descripcion_labor}
             onChange={(e) => handleInputChange('descripcion_labor', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
             placeholder="Describe brevemente en qué consiste esta labor..."
             disabled={isSubmitting || loading}
           />

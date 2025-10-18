@@ -31,7 +31,7 @@ export default function LaboresFilters({
           placeholder="Buscar por trabajador, cultivo o lote..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-black placeholder-gray-600"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 placeholder-gray-500"
         />
       </div>
       <div className="flex gap-2">

@@ -282,7 +282,7 @@ function CultivosContent() {
                   id="nombre_cultivo"
                   value={formData.nombre_cultivo}
                   onChange={(e) => setFormData({ ...formData, nombre_cultivo: e.target.value })}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 placeholder-gray-400 ${
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 placeholder-gray-500 ${
                     formErrors.nombre_cultivo ? 'border-red-300' : 'border-gray-300'
                   }`}
                   placeholder="Ej: Maíz, Café, Plátano..."
@@ -301,7 +301,7 @@ function CultivosContent() {
                   rows={3}
                   value={formData.descripcion_cultivo}
                   onChange={(e) => setFormData({ ...formData, descripcion_cultivo: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 placeholder-gray-400 resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 placeholder-gray-500 resize-none"
                   placeholder="Descripción opcional del cultivo..."
                 />
               </div>
