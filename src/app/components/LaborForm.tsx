@@ -18,9 +18,10 @@ interface LaborFormProps {
   lotes: Lote[];
   onSubmit: (data: any) => Promise<void>;
   onCancel: () => void;
+  variant?: 'modal' | 'inline';
 }
 
-export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, lotes, onSubmit, onCancel }: LaborFormProps) {
+export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, lotes, onSubmit, onCancel, variant = 'modal' }: LaborFormProps) {
 
   const [formData, setFormData] = useState({
     fecha: labor?.fecha ? (labor.fecha.split('T')?.[0] || new Date().toISOString().split('T')[0]) : new Date().toISOString().split('T')[0],
@@ -169,22 +170,26 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, l
     return { lat, lon, embedUrl, osmLink };
   };
 
+  const isModal = variant !== 'inline';
+
   return (
-    <div className="fixed inset-0 bg-white/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className={isModal ? "fixed inset-0 bg-white/20 backdrop-blur-sm flex items-center justify-center p-4 z-50" : ""}>
+      <div className={isModal ? "bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" : "bg-white rounded-xl shadow-sm border border-gray-200 w-full"}>
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-semibold text-gray-900">
               {labor ? 'Editar Labor' : 'Nueva Labor Agrícola'}
             </h3>
-            <button
-              onClick={onCancel}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            {isModal && (
+              <button
+                onClick={onCancel}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">

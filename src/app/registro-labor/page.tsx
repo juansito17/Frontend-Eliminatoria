@@ -72,6 +72,7 @@ export default function RegistroLaborPageContent() {
             lotes={lotes}
             onSubmit={handleSubmit}
             onCancel={() => router.push('/dashboard')}
+            variant="inline"
           />
         </div>
       </div>

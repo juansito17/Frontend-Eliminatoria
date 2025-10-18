@@ -1,4 +1,7 @@
+'use client';
 import { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
+import { useAuth } from '../context/AuthContext';
 
 export interface LaborTipo {
   id_labor_tipo: number;
@@ -25,9 +28,16 @@ export const useLaboresTipos = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Función para obtener el token de autenticación
+  // Obtener token desde AuthContext, cookies o localStorage
+  const { token: authToken } = useAuth();
   const getAuthToken = (): string | null => {
-    return localStorage.getItem('token');
+    if (authToken) return authToken;
+    const cookieToken = Cookies.get('token');
+    if (cookieToken) return cookieToken;
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('token');
+    }
+    return null;
   };
 
   // Función para obtener todos los tipos de labores
@@ -38,7 +48,9 @@ export const useLaboresTipos = () => {
 
       const token = getAuthToken();
       if (!token) {
-        throw new Error('No se encontró token de autenticación');
+        setError('No se encontró token de autenticación');
+        setLoading(false);
+        return;
       }
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/labores-tipos`, {
@@ -73,7 +85,8 @@ export const useLaboresTipos = () => {
 
       const token = getAuthToken();
       if (!token) {
-        throw new Error('No se encontró token de autenticación');
+        setError('No se encontró token de autenticación');
+        return false;
       }
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/labores-tipos`, {
@@ -114,7 +127,8 @@ export const useLaboresTipos = () => {
 
       const token = getAuthToken();
       if (!token) {
-        throw new Error('No se encontró token de autenticación');
+        setError('No se encontró token de autenticación');
+        return false;
       }
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/labores-tipos/${data.id_labor_tipo}`, {
@@ -163,7 +177,8 @@ export const useLaboresTipos = () => {
 
       const token = getAuthToken();
       if (!token) {
-        throw new Error('No se encontró token de autenticación');
+        setError('No se encontró token de autenticación');
+        return false;
       }
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/labores-tipos/${id}`, {

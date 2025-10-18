@@ -106,48 +106,27 @@ function LaboresAgricolasContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <div className="h-10 w-10 bg-gradient-to-r from-green-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
-                <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Gestión de Labores Agrícolas</h1>
-                <p className="text-sm text-gray-600">Registro y seguimiento de actividades de campo</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <a
-                href="/dashboard"
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+    <>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Gestión de Labores Agrícolas</h1>
+            <p className="text-sm text-gray-600">Registro y seguimiento de actividades de campo</p>
+          </div>
+          <div className="flex items-center gap-3">
+            {(user?.rol === 1 || user?.rol === 2 || user?.rol === 3) && (
+              <button
+                onClick={() => setShowModal(true)}
+                className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-green-700 hover:to-blue-700 transition-all duration-200 flex items-center"
               >
-                ← Volver al Dashboard
-              </a>
-              <span className="text-sm text-gray-700">Hola, {user?.username || 'Usuario'}</span>
-              {(user?.rol === 1 || user?.rol === 2 || user?.rol === 3) && ( // Operario, Supervisor y Administrador pueden crear
-                <button
-                  onClick={() => setShowModal(true)}
-                  className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-green-700 hover:to-blue-700 transition-all duration-200 flex items-center"
-                >
-                  <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  Nueva Labor
-                </button>
-              )}
-            </div>
+                <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Nueva Labor
+              </button>
+            )}
           </div>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <LaboresFilters
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
@@ -172,8 +151,7 @@ function LaboresAgricolasContent() {
           totalPages={totalPages}
           onPageChange={setCurrentPage}
         />
-      </main>
-
+      </div>
       {/* Modal Form */}
       {showModal && (
         <LaborForm
@@ -189,14 +167,16 @@ function LaboresAgricolasContent() {
           }}
         />
       )}
-    </div>
+    </>
   );
 }
 
 export default function LaboresAgricolasPage() {
   return (
     <ProtectedRoute roles={[1,2]}>
-      <LaboresAgricolasContent />
+      <DashboardLayout>
+        <LaboresAgricolasContent />
+      </DashboardLayout>
     </ProtectedRoute>
   );
 }

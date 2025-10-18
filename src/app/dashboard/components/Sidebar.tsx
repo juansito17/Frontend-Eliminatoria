@@ -7,10 +7,23 @@ interface SidebarProps {
   username?: string | null;
 }
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Sidebar({ rol, username }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Asegurarnos de que el componente se re-renderice cuando el rol cambie
+  useEffect(() => {
+    // Forzar un re-render cuando el rol esté disponible
+    if (rol !== undefined && rol !== null) {
+      setCollapsed(false);
+    }
+  }, [rol]);
   return (
     <aside
       className={`fixed top-0 left-0 h-screen bg-white shadow-lg z-40 flex flex-col justify-between transition-all duration-300 ${collapsed ? 'w-16' : 'w-64'}`}
@@ -72,7 +85,6 @@ export default function Sidebar({ rol, username }: SidebarProps) {
             <>
               <SidebarLink href="/registro-labor" label="Registrar Labor" collapsed={collapsed} />
               <SidebarLink href="/mis-labores" label="Mis Labores" collapsed={collapsed} />
-              <SidebarLink href="/alertas" label="Notificaciones" collapsed={collapsed} />
             </>
           )}
         </nav>

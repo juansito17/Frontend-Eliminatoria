@@ -421,7 +421,7 @@ function AlertasContent() {
 
 function AlertasPage() {
   return (
-    <ProtectedRoute>
+    <ProtectedRoute roles={[1, 2]}>
       <DashboardLayout>
         <AlertasContent />
       </DashboardLayout>

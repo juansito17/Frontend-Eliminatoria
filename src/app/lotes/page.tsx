@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/Toast';
 import { useConfirm } from '../components/ConfirmModal';
 import { useCultivos } from '../hooks/useCultivos';
+import DashboardLayout from '../DashboardLayout';
 
 interface Lote {
   id: number;
@@ -15,7 +16,7 @@ interface Lote {
   cultivo_nombre?: string;
 }
 
-export default function LotesPage() {
+function LotesContent() {
   const { token } = useAuth();
   const { showToast } = useToast();
   const showConfirm = useConfirm();
@@ -158,7 +159,6 @@ export default function LotesPage() {
   };
 
   return (
-    <ProtectedRoute roles={[1]}>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
         <div className="max-w-7xl mx-auto">
           <header className="flex items-center justify-between mb-6">
@@ -255,6 +255,15 @@ export default function LotesPage() {
           </div>
         )}
       </div>
+    );
+}
+
+export default function LotesPage() {
+  return (
+    <ProtectedRoute roles={[1]}>
+      <DashboardLayout>
+        <LotesContent />
+      </DashboardLayout>
     </ProtectedRoute>
   );
 }
