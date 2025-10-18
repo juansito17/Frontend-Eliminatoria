@@ -125,6 +125,7 @@ function ReportesContent() {
   });
 
   const [loading, setLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Función para obtener datos de producción diaria
@@ -298,7 +299,7 @@ function ReportesContent() {
         setLoading(false);
         return;
       }
-      setLoading(true);
+      setIsFetching(true);
       await Promise.all([
         fetchProduccionDiaria(),
         fetchRendimientoLote(),
@@ -306,7 +307,10 @@ function ReportesContent() {
         fetchHistoricoLabores(),
         fetchLaboresDetallado()
       ]);
-      setLoading(false);
+      if (loading) {
+        setLoading(false);
+      }
+      setIsFetching(false);
     };
 
     loadAllData();
@@ -394,12 +398,27 @@ function ReportesContent() {
     },
   };
 
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Cargando reportes...</div>;
-  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative">
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-20 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white bg-opacity-95 text-black px-4 py-3 rounded-md shadow">
+            Cargando...
+          </div>
+        </div>
+      )}
+      {isFetching && !loading && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className="bg-white bg-opacity-95 text-black px-3 py-2 rounded-md shadow flex items-center gap-2">
+            <svg className="h-4 w-4 animate-spin text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            </svg>
+            Actualizando...
+          </div>
+        </div>
+      )}
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -454,6 +473,7 @@ function ReportesContent() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className={`transition-all duration-200 ${isFetching ? 'opacity-70 blur-sm' : 'opacity-100 blur-0'}`}>
         {/* Filtros */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Filtros</h3>
@@ -464,7 +484,7 @@ function ReportesContent() {
                 type="date"
                 value={filtros.fechaInicio}
                 onChange={(e) => handleFiltroChange('fechaInicio', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
@@ -473,7 +493,7 @@ function ReportesContent() {
                 type="date"
                 value={filtros.fechaFin}
                 onChange={(e) => handleFiltroChange('fechaFin', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
@@ -481,11 +501,11 @@ function ReportesContent() {
               <select
                 value={filtros.cultivoId}
                 onChange={(e) => handleFiltroChange('cultivoId', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">Todos</option>
+                <option className="text-black" value="">Todos</option>
                 {cultivos.map(cultivo => (
-                  <option key={cultivo.id} value={cultivo.id.toString()}>
+                  <option className="text-black" key={cultivo.id} value={cultivo.id.toString()}>
                     {cultivo.nombre}
                   </option>
                 ))}
@@ -496,11 +516,11 @@ function ReportesContent() {
               <select
                 value={filtros.laborId}
                 onChange={(e) => handleFiltroChange('laborId', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">Todos</option>
+                <option className="text-black" value="">Todos</option>
                 {tiposLabor.map(tipo => (
-                  <option key={tipo.id} value={tipo.id.toString()}>
+                  <option className="text-black" key={tipo.id} value={tipo.id.toString()}>
                     {tipo.nombre}
                   </option>
                 ))}
@@ -511,11 +531,11 @@ function ReportesContent() {
               <select
                 value={filtros.trabajadorId}
                 onChange={(e) => handleFiltroChange('trabajadorId', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-black placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">Todos</option>
+                <option className="text-black" value="">Todos</option>
                 {trabajadores.map(trabajador => (
-                  <option key={trabajador.id} value={trabajador.id.toString()}>
+                  <option className="text-black" key={trabajador.id} value={trabajador.id.toString()}>
                     {trabajador.nombre}
                   </option>
                 ))}
@@ -694,6 +714,7 @@ function ReportesContent() {
             </div>
           )}
         </div>
+      </div>
       </main>
     </div>
   );

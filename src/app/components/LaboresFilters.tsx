@@ -31,28 +31,28 @@ export default function LaboresFilters({
           placeholder="Buscar por trabajador, cultivo o lote..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-black placeholder-gray-600"
         />
       </div>
       <div className="flex gap-2">
         <select
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-900"
+          className="px-4 py-2 border border-gray-300 rounded-lg bg-white appearance-none shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-black"
           value={filtroCultivo || ''}
           onChange={(e) => onFiltroCultivoChange(e.target.value === '' ? '' : e.target.value)}
         >
-          <option value="">Todos los cultivos</option>
+          <option className="text-black" value="">Todos los cultivos</option>
           {cultivos.map(cultivo => (
-            <option key={cultivo.id} value={cultivo.id}>{cultivo.nombre}</option>
+            <option className="text-black" key={cultivo.id} value={cultivo.id}>{cultivo.nombre}</option>
           ))}
         </select>
         <select
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-900"
+          className="px-4 py-2 border border-gray-300 rounded-lg bg-white appearance-none shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-black"
           value={filtroTipoLabor || ''}
           onChange={(e) => onFiltroTipoLaborChange(e.target.value === '' ? '' : e.target.value)}
         >
-          <option value="">Todos los tipos</option>
+          <option className="text-black" value="">Todos los tipos</option>
           {tiposLabor.map(tipo => (
-            <option key={tipo.id} value={tipo.id}>{tipo.nombre}</option>
+            <option className="text-black" key={tipo.id} value={tipo.id}>{tipo.nombre}</option>
           ))}
         </select>
       </div>
