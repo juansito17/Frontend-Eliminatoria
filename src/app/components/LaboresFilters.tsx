@@ -7,9 +7,9 @@ interface LaboresFiltersProps {
   onSearchChange: (term: string) => void;
   cultivos: Cultivo[];
   tiposLabor: TipoLabor[];
-  filtroCultivo: string | null;
+  filtroCultivo: string;
   onFiltroCultivoChange: (cultivoId: string) => void;
-  filtroTipoLabor: string | null;
+  filtroTipoLabor: string;
   onFiltroTipoLaborChange: (tipoLaborId: string) => void;
 }
 
@@ -38,7 +38,7 @@ export default function LaboresFilters({
         <select
           className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-900"
           value={filtroCultivo || ''}
-          onChange={(e) => onFiltroCultivoChange(e.target.value)}
+          onChange={(e) => onFiltroCultivoChange(e.target.value === '' ? '' : e.target.value)}
         >
           <option value="">Todos los cultivos</option>
           {cultivos.map(cultivo => (
@@ -48,7 +48,7 @@ export default function LaboresFilters({
         <select
           className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-900"
           value={filtroTipoLabor || ''}
-          onChange={(e) => onFiltroTipoLaborChange(e.target.value)}
+          onChange={(e) => onFiltroTipoLaborChange(e.target.value === '' ? '' : e.target.value)}
         >
           <option value="">Todos los tipos</option>
           {tiposLabor.map(tipo => (

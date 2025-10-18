@@ -41,8 +41,8 @@ export function useLaboresAgricolas() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filtroCultivo, setFiltroCultivo] = useState<string | null>(null);
-  const [filtroTipoLabor, setFiltroTipoLabor] = useState<string | null>(null);
+  const [filtroCultivo, setFiltroCultivo] = useState<string>('');
+  const [filtroTipoLabor, setFiltroTipoLabor] = useState<string>('');
   const itemsPerPage = 10;
 
   const loadLabores = async () => {
@@ -135,6 +135,10 @@ export function useLaboresAgricolas() {
       console.error('Error loading tipos de labor:', error);
     }
   };
+
+  useEffect(() => {
+    setCurrentPage(1); // Reiniciar a la primera página cuando cambian los filtros
+  }, [searchTerm, filtroCultivo, filtroTipoLabor]);
 
   useEffect(() => {
     loadLabores();
