@@ -470,57 +470,7 @@ function ReportesContent() {
           </div>
         </div>
       )}
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <div className="h-10 w-10 bg-gradient-to-r from-green-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
-                <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Sistema Agrícola Inteligente</h1>
-                <p className="text-sm text-gray-600">Reportes y Estadísticas</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <a
-                href="/dashboard"
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-              >
-                Dashboard
-              </a>
-              <a
-                href="/cultivos"
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-              >
-                Gestión de Cultivos
-              </a>
-              <a
-                href="/labores-agricolas"
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-              >
-                Gestión de Labores
-              </a>
-              <span className="text-sm text-gray-700">Hola, {user?.username || 'Usuario'}</span>
-              <button
-                onClick={handleLogout}
-                className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                title="Cerrar sesión"
-              >
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-              </button>
-              <div className="h-8 w-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-medium">{user?.username?.charAt(0).toUpperCase()}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* Header eliminado: DashboardLayout ya renderiza el encabezado global */}
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

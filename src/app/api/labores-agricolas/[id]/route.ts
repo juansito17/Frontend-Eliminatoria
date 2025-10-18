@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await req.json();
@@ -13,7 +13,7 @@ export async function PUT(
       return NextResponse.json({ message: 'Token no proporcionado' }, { status: 401 });
     }
 
-    const response = await fetch(`${backendUrl}/api/labores-agricolas/${params.id}`, {
+    const response = await fetch(`${backendUrl}/api/labores-agricolas/${(await params).id}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -37,7 +37,7 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3000';
@@ -47,7 +47,7 @@ export async function DELETE(
       return NextResponse.json({ message: 'Token no proporcionado' }, { status: 401 });
     }
 
-    const response = await fetch(`${backendUrl}/api/labores-agricolas/${params.id}`, {
+    const response = await fetch(`${backendUrl}/api/labores-agricolas/${(await params).id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,

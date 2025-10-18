@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import ProtectedRoute from '../components/ProtectedRoute';
+import DashboardLayout from '../DashboardLayout';
 import { useLaboresAgricolas, LaborAgricola } from '../hooks/useLaboresAgricolas';
 import LaboresTable from '../components/LaboresTable';
 import LaborForm from '../components/LaborForm';

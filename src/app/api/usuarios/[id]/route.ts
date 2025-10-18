@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3001';
 
-// GET /api/usuarios/:id
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+ // GET /api/usuarios/:id
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const authHeader = request.headers.get('Authorization');
 
     const headers: HeadersInit = { 'Content-Type': 'application/json' };
@@ -28,10 +28,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-// PUT /api/usuarios/:id
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+ // PUT /api/usuarios/:id
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const authHeader = request.headers.get('Authorization');
     const body = await request.json();
 
@@ -57,10 +57,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-// DELETE /api/usuarios/:id
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+ // DELETE /api/usuarios/:id
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const authHeader = request.headers.get('Authorization');
 
     const headers: HeadersInit = { 'Content-Type': 'application/json' };

@@ -5,7 +5,7 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost
 // GET /api/cultivos/[id] - Obtener un cultivo específico
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authHeader = request.headers.get('Authorization');
@@ -17,7 +17,7 @@ export async function GET(
       headers['Authorization'] = authHeader;
     }
 
-    const response = await fetch(`${BACKEND_URL}/api/cultivos/${params.id}`, {
+    const response = await fetch(`${BACKEND_URL}/api/cultivos/${(await params).id}`, {
       headers: headers,
     });
 
@@ -43,7 +43,7 @@ export async function GET(
 // PUT /api/cultivos/[id] - Actualizar un cultivo específico
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authHeader = request.headers.get('Authorization');
@@ -56,7 +56,7 @@ export async function PUT(
       headers['Authorization'] = authHeader;
     }
 
-    const response = await fetch(`${BACKEND_URL}/api/cultivos/${params.id}`, {
+    const response = await fetch(`${BACKEND_URL}/api/cultivos/${(await params).id}`, {
       method: 'PUT',
       headers: headers,
       body: JSON.stringify(body),
@@ -84,7 +84,7 @@ export async function PUT(
 // DELETE /api/cultivos/[id] - Eliminar un cultivo específico
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authHeader = request.headers.get('Authorization');
@@ -96,7 +96,7 @@ export async function DELETE(
       headers['Authorization'] = authHeader;
     }
 
-    const response = await fetch(`${BACKEND_URL}/api/cultivos/${params.id}`, {
+    const response = await fetch(`${BACKEND_URL}/api/cultivos/${(await params).id}`, {
       method: 'DELETE',
       headers: headers,
     });
