@@ -126,8 +126,11 @@ function AlertasContent() {
       });
 
       if (response.ok) {
-        // La actualización se reflejará automáticamente a través del WebSocket
+        // Actualización optimista por si el evento de WebSocket se pierde
+        setAlertas((prev) => prev.map((a) => (a.id === id ? { ...a, resuelta: true } : a)));
         console.log('Alerta marcada como resuelta');
+        // Re-fetch para asegurar coherencia total con el backend
+        fetchAlertas();
       } else {
         console.error('Error al actualizar alerta:', response.statusText);
       }
@@ -149,8 +152,11 @@ function AlertasContent() {
       });
 
       if (response.ok) {
-        // La eliminación se reflejará automáticamente a través del WebSocket
+        // Eliminación optimista por si el evento de WebSocket se pierde
+        setAlertas((prev) => prev.filter((a) => a.id !== id));
         console.log('Alerta eliminada');
+        // Re-fetch para asegurar coherencia total con el backend
+        fetchAlertas();
       } else {
         console.error('Error al eliminar alerta:', response.statusText);
       }
