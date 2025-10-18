@@ -34,6 +34,7 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, l
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [locating, setLocating] = useState(false);
 
   const { showToast } = useToast();
 
@@ -102,20 +103,56 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, l
   };
 
   const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const coords = `${position.coords.latitude},${position.coords.longitude}`;
-          setFormData({ ...formData, ubicacionGPS: coords });
-        },
-        (error) => {
-          console.error('Error getting location:', error);
+    if (!navigator.geolocation) {
+      showToast('Geolocalización no es soportada por este navegador', 'error');
+      return;
+    }
+
+    setLocating(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coords = `${position.coords.latitude},${position.coords.longitude}`;
+        setFormData({ ...formData, ubicacionGPS: coords });
+        setLocating(false);
+        showToast('Ubicación capturada', 'success');
+      },
+      (error) => {
+        console.error('Error getting location:', error);
+        setLocating(false);
+        if (error.code === error.PERMISSION_DENIED) {
+          showToast('Permiso denegado para acceder a la ubicación', 'error');
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          showToast('Ubicación no disponible', 'error');
+        } else if (error.code === error.TIMEOUT) {
+          showToast('Tiempo de espera agotado al obtener ubicación', 'error');
+        } else {
           showToast('No se pudo obtener la ubicación GPS', 'error');
         }
-      );
-    } else {
-      showToast('Geolocalización no es soportada por este navegador', 'error');
-    }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+  };
+
+  const getMapUrls = (ubic: string | null) => {
+    if (!ubic) return null;
+    const parts = typeof ubic === 'string' ? ubic.split(',').map(p => p.trim()) : null;
+    if (!parts || parts.length < 2) return null;
+    const lat = parseFloat(parts[0]);
+    const lon = parseFloat(parts[1]);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+    const delta = 0.01;
+    const minLat = lat - delta;
+    const minLon = lon - delta;
+    const maxLat = lat + delta;
+    const maxLon = lon + delta;
+    const embedUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${minLon}%2C${minLat}%2C${maxLon}%2C${maxLat}&layer=mapnik&marker=${lat}%2C${lon}`;
+    const osmLink = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=17/${lat}/${lon}`;
+    return { lat, lon, embedUrl, osmLink };
   };
 
   return (
@@ -286,11 +323,59 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, l
                 <button
                   type="button"
                   onClick={getCurrentLocation}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  disabled={locating}
+                  className={`px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors ${locating ? 'opacity-70 cursor-wait' : ''}`}
                 >
-                  Capturar
+                  {locating ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                      </svg>
+                      Capturando...
+                    </span>
+                  ) : (
+                    'Capturar'
+                  )}
                 </button>
               </div>
+
+              {(() => {
+                const m = getMapUrls(formData.ubicacionGPS);
+                if (!m) return null;
+                return (
+                  <div className="mt-3">
+                    <div className="border rounded overflow-hidden">
+                      <iframe
+                        title="Mapa ubicación"
+                        className="w-full h-48"
+                        src={m.embedUrl}
+                        style={{ border: 0 }}
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="mt-2 flex gap-3 items-center">
+                      <a href={m.osmLink} target="_blank" rel="noreferrer" className="text-sm text-blue-600 hover:underline">
+                        Abrir en OpenStreetMap
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (navigator.clipboard) {
+                            navigator.clipboard.writeText(`${m.lat},${m.lon}`);
+                            showToast('Coordenadas copiadas', 'success');
+                          } else {
+                            showToast('Tu navegador no soporta copiar al portapapeles', 'error');
+                          }
+                        }}
+                        className="text-sm text-gray-700 hover:underline"
+                      >
+                        Copiar coordenadas
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             <div className="flex justify-end space-x-3 pt-4">
