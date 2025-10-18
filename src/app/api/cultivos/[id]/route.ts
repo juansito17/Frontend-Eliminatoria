@@ -8,10 +8,17 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const authHeader = request.headers.get('Authorization');
+
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+
     const response = await fetch(`${BACKEND_URL}/api/cultivos/${params.id}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: headers,
     });
 
     if (!response.ok) {
@@ -39,13 +46,19 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const authHeader = request.headers.get('Authorization');
     const body = await request.json();
+
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
 
     const response = await fetch(`${BACKEND_URL}/api/cultivos/${params.id}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: headers,
       body: JSON.stringify(body),
     });
 
@@ -74,11 +87,18 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const authHeader = request.headers.get('Authorization');
+
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+
     const response = await fetch(`${BACKEND_URL}/api/cultivos/${params.id}`, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: headers,
     });
 
     if (!response.ok) {

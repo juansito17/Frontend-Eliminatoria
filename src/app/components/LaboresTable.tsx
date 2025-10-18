@@ -1,15 +1,17 @@
 'use client';
 
 import { LaborAgricola } from '../hooks/useLaboresAgricolas';
+import { User } from '../context/AuthContext'; // Importar la interfaz User
 
 interface LaboresTableProps {
   labores: LaborAgricola[];
   isLoading: boolean;
   onEdit: (labor: LaborAgricola) => void;
   onDelete: (id: number) => void;
+  currentUser: User | null; // Añadir currentUser a las props
 }
 
-export default function LaboresTable({ labores, isLoading, onEdit, onDelete }: LaboresTableProps) {
+export default function LaboresTable({ labores, isLoading, onEdit, onDelete, currentUser }: LaboresTableProps) {
   if (isLoading) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
@@ -85,18 +87,22 @@ export default function LaboresTable({ labores, isLoading, onEdit, onDelete }: L
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex justify-end space-x-2">
-                    <button
-                      onClick={() => onEdit(labor)}
-                      className="bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 px-3 py-1 rounded-md text-xs font-medium transition-colors border border-blue-200"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => onDelete(labor.id)}
-                      className="bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 px-3 py-1 rounded-md text-xs font-medium transition-colors border border-red-200"
-                    >
-                      Eliminar
-                    </button>
+                    {(currentUser?.rol === 1 || currentUser?.rol === 2 || (currentUser?.rol === 3 && currentUser?.id === labor.id_usuario_registro)) && (
+                      <button
+                        onClick={() => onEdit(labor)}
+                        className="bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 px-3 py-1 rounded-md text-xs font-medium transition-colors border border-blue-200"
+                      >
+                        Editar
+                      </button>
+                    )}
+                    {currentUser?.rol === 1 && ( // Solo el Administrador (rol 1) puede eliminar
+                      <button
+                        onClick={() => onDelete(labor.id)}
+                        className="bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 px-3 py-1 rounded-md text-xs font-medium transition-colors border border-red-200"
+                      >
+                        Eliminar
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

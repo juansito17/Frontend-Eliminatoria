@@ -14,8 +14,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sistema Agrícola Inteligente",
-  description: "Sistema inteligente de monitoreo y gestión agrícola",
+  title: "AgroTech - Sistema Inteligente de Agricultura de Precisión | Hackathon 2.0",
+  description: "Sistema inteligente de monitoreo y gestión agrícola desarrollado para el Hackathon 2.0. Revoluciona la industria agrícola con tecnología avanzada de análisis en tiempo real, dashboard interactivo y reportes automáticos.",
+  keywords: "agricultura de precisión, hackathon, sistema agrícola, monitoreo, análisis de datos, agroindustria, transformación digital",
+  authors: [{ name: "Politécnico Colombiano Jaime Isaza Cadavid" }],
+  openGraph: {
+    title: "AgroTech - Sistema Inteligente de Agricultura de Precisión",
+    description: "Sistema inteligente desarrollado para el Hackathon 2.0 que revoluciona la gestión agrícola mediante tecnología avanzada.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

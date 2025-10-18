@@ -22,6 +22,10 @@ function LaboresAgricolasContent() {
     searchTerm,
     setCurrentPage,
     setSearchTerm,
+    filtroCultivo,
+    setFiltroCultivo,
+    filtroTipoLabor,
+    setFiltroTipoLabor,
     loadLabores,
     setLabores
   } = useLaboresAgricolas();
@@ -87,12 +91,6 @@ function LaboresAgricolasContent() {
     }
   };
 
-  const filteredLabores = labores.filter(labor =>
-    labor.trabajador.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    labor.cultivo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    labor.lote.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
@@ -111,16 +109,24 @@ function LaboresAgricolasContent() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">Hola, {user?.username || 'Usuario'}</span>
-              <button
-                onClick={() => setShowModal(true)}
-                className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-green-700 hover:to-blue-700 transition-all duration-200 flex items-center"
+              <a
+                href="/dashboard"
+                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
               >
-                <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Nueva Labor
-              </button>
+                ← Volver al Dashboard
+              </a>
+              <span className="text-sm text-gray-700">Hola, {user?.username || 'Usuario'}</span>
+              {(user?.rol === 1 || user?.rol === 2 || user?.rol === 3) && ( // Operario, Supervisor y Administrador pueden crear
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-green-700 hover:to-blue-700 transition-all duration-200 flex items-center"
+                >
+                  <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Nueva Labor
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -133,13 +139,18 @@ function LaboresAgricolasContent() {
           onSearchChange={setSearchTerm}
           cultivos={cultivos}
           tiposLabor={tiposLabor}
+          filtroCultivo={filtroCultivo}
+          onFiltroCultivoChange={setFiltroCultivo}
+          filtroTipoLabor={filtroTipoLabor}
+          onFiltroTipoLaborChange={setFiltroTipoLabor}
         />
 
         <LaboresTable
-          labores={filteredLabores}
+          labores={labores}
           isLoading={isLoading}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          currentUser={user} // Pasar el usuario actual a LaboresTable
         />
 
         <Pagination

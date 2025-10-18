@@ -11,7 +11,7 @@ interface CultivoFormData {
 }
 
 function CultivosContent() {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading, token } = useAuth(); // Importar isLoading y token
   const {
     cultivos,
     loading,
@@ -32,8 +32,10 @@ function CultivosContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    fetchCultivos();
-  }, [fetchCultivos]);
+    if (!isLoading && token) { // Solo llamar a fetchCultivos si no está cargando y hay un token
+      fetchCultivos();
+    }
+  }, [fetchCultivos, isLoading, token]); // Añadir isLoading y token como dependencias
 
   const resetForm = () => {
     setFormData({
@@ -48,8 +50,8 @@ function CultivosContent() {
     if (cultivo) {
       setEditingCultivo(cultivo);
       setFormData({
-        nombre_cultivo: cultivo.nombre_cultivo,
-        descripcion_cultivo: cultivo.descripcion_cultivo || ''
+        nombre_cultivo: cultivo.nombre,
+        descripcion_cultivo: cultivo.descripcion || ''
       });
     } else {
       resetForm();
@@ -84,7 +86,7 @@ function CultivosContent() {
 
     try {
       if (editingCultivo) {
-        await updateCultivo(editingCultivo.id_cultivo, formData);
+        await updateCultivo(editingCultivo.id, formData);
       } else {
         await createCultivo(formData);
       }
@@ -180,7 +182,7 @@ function CultivosContent() {
               >
                 Gestión de Labores
               </a>
-              <span className="text-sm text-gray-700">Hola, {user?.username}</span>
+              <span className="text-sm text-gray-700">Hola, {user?.username || 'Usuario'}</span>
               <button
                 onClick={handleLogout}
                 className="p-2 text-gray-400 hover:text-red-600 transition-colors"
@@ -262,15 +264,15 @@ function CultivosContent() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {cultivos.map((cultivo) => (
-                    <tr key={cultivo.id_cultivo} className="hover:bg-gray-50">
+                    <tr key={cultivo.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          {cultivo.nombre_cultivo}
+                          {cultivo.nombre}
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-900 max-w-xs truncate">
-                          {cultivo.descripcion_cultivo || 'Sin descripción'}
+                          {cultivo.descripcion || 'Sin descripción'}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -290,7 +292,7 @@ function CultivosContent() {
                             </svg>
                           </button>
                           <button
-                            onClick={() => handleDelete(cultivo.id_cultivo)}
+                            onClick={() => handleDelete(cultivo.id)}
                             className="text-red-600 hover:text-red-900 p-2 rounded-md hover:bg-red-50 transition-colors"
                             title="Eliminar cultivo"
                           >
@@ -329,7 +331,7 @@ function CultivosContent() {
                   id="nombre_cultivo"
                   value={formData.nombre_cultivo}
                   onChange={(e) => setFormData({ ...formData, nombre_cultivo: e.target.value })}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 placeholder-gray-400 ${
                     formErrors.nombre_cultivo ? 'border-red-300' : 'border-gray-300'
                   }`}
                   placeholder="Ej: Maíz, Café, Plátano..."
@@ -348,7 +350,7 @@ function CultivosContent() {
                   rows={3}
                   value={formData.descripcion_cultivo}
                   onChange={(e) => setFormData({ ...formData, descripcion_cultivo: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 placeholder-gray-400 resize-none"
                   placeholder="Descripción opcional del cultivo..."
                 />
               </div>

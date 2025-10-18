@@ -2,9 +2,9 @@ import { useState, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext'; // Importar useAuth
 
 export interface Cultivo {
-  id_cultivo: number;
-  nombre_cultivo: string;
-  descripcion_cultivo: string;
+  id: number;
+  nombre: string;
+  descripcion: string;
   fecha_creacion: string;
 }
 
@@ -30,6 +30,11 @@ export const useCultivos = (): UseCultivosReturn => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchCultivos = useCallback(async () => {
+    if (!token) {
+      setError('No hay token de autenticación disponible.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -45,14 +50,14 @@ export const useCultivos = (): UseCultivosReturn => {
       }
 
       const data = await response.json();
-      setCultivos(data);
+      setCultivos(data.cultivos || []);
     } catch (err: any) {
       console.error('Error al obtener cultivos:', err);
       setError(err.message || 'Error desconocido al cargar los cultivos');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [token]);
 
   const createCultivo = useCallback(async (data: CultivoFormData) => {
     setLoading(true);

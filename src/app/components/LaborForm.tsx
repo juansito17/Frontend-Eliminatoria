@@ -13,6 +13,7 @@ interface LaborFormProps {
 }
 
 export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, onSubmit, onCancel }: LaborFormProps) {
+
   const [formData, setFormData] = useState({
     fecha: labor?.fecha || new Date().toISOString().split('T')[0],
     cultivoId: labor?.cultivo || '',

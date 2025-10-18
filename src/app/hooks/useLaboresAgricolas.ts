@@ -12,6 +12,7 @@ export interface LaborAgricola {
   peso: number;
   hora: string;
   ubicacionGPS?: string;
+  id_usuario_registro: number; // Añadido para permisos de operario
 }
 
 export interface Cultivo {
@@ -31,6 +32,7 @@ export interface TipoLabor {
 
 export function useLaboresAgricolas() {
   const { token } = useAuth();
+
   const [labores, setLabores] = useState<LaborAgricola[]>([]);
   const [cultivos, setCultivos] = useState<Cultivo[]>([]);
   const [trabajadores, setTrabajadores] = useState<Trabajador[]>([]);
@@ -39,6 +41,8 @@ export function useLaboresAgricolas() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filtroCultivo, setFiltroCultivo] = useState<string | null>(null);
+  const [filtroTipoLabor, setFiltroTipoLabor] = useState<string | null>(null);
   const itemsPerPage = 10;
 
   const loadLabores = async () => {
@@ -46,13 +50,20 @@ export function useLaboresAgricolas() {
 
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/labores-agricolas?page=${currentPage}&limit=${itemsPerPage}&search=${searchTerm}`, {
+      let url = `/api/labores-agricolas?page=${currentPage}&limit=${itemsPerPage}&search=${searchTerm}`;
+      if (filtroCultivo) {
+        url += `&cultivoId=${filtroCultivo}`;
+      }
+      if (filtroTipoLabor) {
+        url += `&tipoLaborId=${filtroTipoLabor}`;
+      }
+
+      const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
-
       if (response.ok) {
         const data = await response.json();
         setLabores(data.labores || []);
@@ -127,7 +138,7 @@ export function useLaboresAgricolas() {
 
   useEffect(() => {
     loadLabores();
-  }, [currentPage, searchTerm, token]);
+  }, [currentPage, searchTerm, filtroCultivo, filtroTipoLabor, token]);
 
   useEffect(() => {
     loadCultivos();
@@ -146,6 +157,10 @@ export function useLaboresAgricolas() {
     searchTerm,
     setCurrentPage,
     setSearchTerm,
+    filtroCultivo,
+    setFiltroCultivo,
+    filtroTipoLabor,
+    setFiltroTipoLabor,
     loadLabores,
     setLabores
   };

@@ -3,10 +3,10 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import Cookies from 'js-cookie';
 
-interface User {
+export interface User { // Exportar la interfaz User
   id: number;
   username: string;
-  role: string;
+  rol: number;
 }
 
 interface AuthContextType {
@@ -42,7 +42,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (response.ok) {
             const data = await response.json();
             setToken(storedToken);
-            setUser(data.user); // Assuming the verify-token endpoint returns user data
+            setUser({
+              id: data.user.id,
+              username: data.user.username,
+              rol: data.user.rol,
+            });
           } else {
             // Token is invalid or expired
             Cookies.remove('token');
@@ -84,8 +88,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setToken(data.token);
         setUser({
           id: data.user?.id || 1,
-          username: data.user?.username || email, // Assuming email can be used as username for display if no username is returned
-          role: data.user?.role || 'user'
+          username: data.user?.username || email,
+          rol: data.user?.rol || 3 // Asignar un rol por defecto si no viene del backend
         });
         return true;
       } else {
