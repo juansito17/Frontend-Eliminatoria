@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { LaborAgricola } from '../hooks/useLaboresAgricolas';
+import { useToast } from './Toast';
 
 interface Cultivo { id: number; nombre: string; }
 interface Trabajador { id: number; nombre: string; }
@@ -33,6 +34,8 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, l
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { showToast } = useToast();
 
   // Cuando cambian labor o listas maestro, intentar mapear nombres a IDs para edición
   useEffect(() => {
@@ -107,11 +110,11 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, l
         },
         (error) => {
           console.error('Error getting location:', error);
-          alert('No se pudo obtener la ubicación GPS');
+          showToast('No se pudo obtener la ubicación GPS', 'error');
         }
       );
     } else {
-      alert('Geolocalización no es soportada por este navegador');
+      showToast('Geolocalización no es soportada por este navegador', 'error');
     }
   };
 

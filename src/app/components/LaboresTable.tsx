@@ -87,14 +87,31 @@ export default function LaboresTable({ labores, isLoading, onEdit, onDelete, cur
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex justify-end space-x-2">
-                    {(currentUser?.rol === 1 || currentUser?.rol === 2 || (currentUser?.rol === 3 && currentUser?.id === labor.id_usuario_registro)) && (
-                      <button
-                        onClick={() => onEdit(labor)}
-                        className="bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 px-3 py-1 rounded-md text-xs font-medium transition-colors border border-blue-200"
-                      >
-                        Editar
-                      </button>
-                    )}
+                    {(() => {
+                      const isAdminOrSupervisor = currentUser?.rol === 1 || currentUser?.rol === 2;
+                      const isOperarioOwner = currentUser?.rol === 3 && currentUser?.id === labor.id_usuario_registro;
+                      let canEdit = !!(isAdminOrSupervisor || isOperarioOwner);
+
+                      // Limitar edición para operarios: ventana de 2 horas desde la fecha de la labor
+                      if (isOperarioOwner) {
+                        try {
+                          const laborTime = new Date(labor.fecha).getTime();
+                          const hours = (Date.now() - laborTime) / (1000 * 60 * 60);
+                          if (hours > 2) canEdit = false;
+                        } catch (e) {
+                          // Si hay error al parsear la fecha, no bloquear por tiempo
+                        }
+                      }
+
+                      return canEdit ? (
+                        <button
+                          onClick={() => onEdit(labor)}
+                          className="bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 px-3 py-1 rounded-md text-xs font-medium transition-colors border border-blue-200"
+                        >
+                          Editar
+                        </button>
+                      ) : null;
+                    })()}
                     {currentUser?.rol === 1 && ( // Solo el Administrador (rol 1) puede eliminar
                       <button
                         onClick={() => onDelete(labor.id)}

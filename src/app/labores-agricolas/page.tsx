@@ -8,6 +8,8 @@ import LaboresTable from '../components/LaboresTable';
 import LaborForm from '../components/LaborForm';
 import LaboresFilters from '../components/LaboresFilters';
 import Pagination from '../components/Pagination';
+import { useConfirm } from '../components/ConfirmModal';
+import { useToast } from '../components/Toast';
 
 function LaboresAgricolasContent() {
   const { user, logout } = useAuth();
@@ -35,6 +37,9 @@ function LaboresAgricolasContent() {
   const [showModal, setShowModal] = useState(false);
   const [editingLabor, setEditingLabor] = useState<LaborAgricola | null>(null);
 
+  const showConfirm = useConfirm();
+  const { showToast } = useToast();
+
   const handleSubmit = async (formData: any) => {
     try {
       const token = localStorage.getItem('token');
@@ -57,11 +62,14 @@ function LaboresAgricolasContent() {
         setShowModal(false);
         setEditingLabor(null);
         loadLabores(); // Reload the table
+        showToast('Labor guardada correctamente', 'success');
       } else {
         console.error('Error saving labor');
+        showToast('Error al guardar la labor', 'error');
       }
     } catch (error) {
       console.error('Error:', error);
+      showToast('Error de conexión al guardar la labor', 'error');
     }
   };
 
@@ -71,7 +79,8 @@ function LaboresAgricolasContent() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('¿Estás seguro de que deseas eliminar esta labor?')) return;
+    const confirmed = await showConfirm('¿Estás seguro de que deseas eliminar esta labor?', { title: 'Eliminar labor', confirmText: 'Eliminar', cancelText: 'Cancelar' });
+    if (!confirmed) return;
 
     try {
       const token = localStorage.getItem('token');
@@ -85,11 +94,14 @@ function LaboresAgricolasContent() {
 
       if (response.ok) {
         loadLabores(); // Reload the table
+        showToast('Labor eliminada', 'success');
       } else {
         console.error('Error deleting labor');
+        showToast('Error al eliminar la labor', 'error');
       }
     } catch (error) {
       console.error('Error:', error);
+      showToast('Error de conexión al eliminar la labor', 'error');
     }
   };
 
