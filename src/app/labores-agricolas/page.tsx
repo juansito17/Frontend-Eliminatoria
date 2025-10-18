@@ -195,7 +195,7 @@ function LaboresAgricolasContent() {
 
 export default function LaboresAgricolasPage() {
   return (
-    <ProtectedRoute>
+    <ProtectedRoute roles={[1,2]}>
       <LaboresAgricolasContent />
     </ProtectedRoute>
   );

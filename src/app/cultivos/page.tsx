@@ -394,7 +394,7 @@ function CultivosContent() {
 
 export default function CultivosPage() {
   return (
-    <ProtectedRoute>
+    <ProtectedRoute roles={[1]}>
       <CultivosContent />
     </ProtectedRoute>
   );

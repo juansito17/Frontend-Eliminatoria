@@ -319,7 +319,7 @@ function UsuariosContent() {
 
 export default function UsuariosPage() {
   return (
-    <ProtectedRoute>
+    <ProtectedRoute roles={[1]}>
       <DashboardLayout>
         <UsuariosContent />
       </DashboardLayout>

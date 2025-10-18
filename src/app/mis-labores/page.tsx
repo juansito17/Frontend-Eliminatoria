@@ -26,7 +26,7 @@ export default function MisLaboresPage() {
   // Filtrar en frontend por id_usuario_registro; idealmente hacerlo en backend
   const misLabores = labores.filter(l => l.id_usuario_registro === user?.id);
   return (
-    <ProtectedRoute>
+    <ProtectedRoute roles={[3]}>
       <DashboardLayout>
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
           <div className="max-w-7xl mx-auto">

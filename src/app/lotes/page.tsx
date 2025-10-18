@@ -158,7 +158,7 @@ export default function LotesPage() {
   };
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute roles={[1]}>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
         <div className="max-w-7xl mx-auto">
           <header className="flex items-center justify-between mb-6">

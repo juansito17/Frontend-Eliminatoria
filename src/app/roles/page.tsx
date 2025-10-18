@@ -255,7 +255,7 @@ function RolesContent() {
 
 export default function Page() {
   return (
-    <ProtectedRoute>
+    <ProtectedRoute roles={[1]}>
       <DashboardLayout>
         <RolesContent />
       </DashboardLayout>

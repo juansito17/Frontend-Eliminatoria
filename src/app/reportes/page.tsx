@@ -762,7 +762,7 @@ import DashboardLayout from '../DashboardLayout';
 
 export default function ReportesPage() {
   return (
-    <ProtectedRoute>
+    <ProtectedRoute roles={[1,2]}>
       <DashboardLayout>
         <ReportesContent />
       </DashboardLayout>

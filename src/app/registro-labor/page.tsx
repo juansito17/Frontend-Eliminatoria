@@ -57,7 +57,7 @@ export default function RegistroLaborPageContent() {
   }
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute roles={[3]}>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
         <div className="max-w-3xl mx-auto">
           <header className="mb-6">
