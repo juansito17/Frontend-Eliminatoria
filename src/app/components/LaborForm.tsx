@@ -1,14 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { LaborAgricola } from '../hooks/useLaboresAgricolas';
+import { LaborAgricola, Cultivo, Trabajador, TipoLabor, Lote } from '../hooks/useLaboresAgricolas';
 import { useToast } from './Toast';
 import { useAuth } from '../context/AuthContext';
-
-interface Cultivo { id: number; nombre: string; }
-interface Trabajador { id: number; nombre: string; }
-interface TipoLabor { id: number; nombre: string; }
-interface Lote { id: number; nombre: string; }
 
 interface LaborFormProps {
   labor?: LaborAgricola | null;
@@ -69,8 +64,8 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, l
 
     // tipo labor
     let tipoLaborId = '';
-    const tipoMatch = tiposLabor.find(t => t.nombre === (labor.tipoLabor || ''));
-    if (tipoMatch) tipoLaborId = String(tipoMatch.id);
+    const tipoMatch = tiposLabor.find(t => t.nombre_labor === (labor.tipoLabor || ''));
+    if (tipoMatch) tipoLaborId = String(tipoMatch.id_labor_tipo);
 
     // lote
     let loteId = '';
@@ -335,7 +330,7 @@ export default function LaborForm({ labor, cultivos, trabajadores, tiposLabor, l
                 >
                   <option value="">Seleccionar tipo</option>
                   {tiposLabor.map(tipo => (
-                    <option key={tipo.id} value={tipo.id}>{tipo.nombre}</option>
+                    <option key={tipo.id_labor_tipo} value={tipo.id_labor_tipo}>{tipo.nombre_labor}</option>
                   ))}
                 </select>
               </div>
