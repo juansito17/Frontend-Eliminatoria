@@ -42,6 +42,20 @@ export default function DashboardHeader({ user, onLogout }: Props) {
             >
               Alertas
             </a>
+
+            {/* Botones de administración */}
+            <a
+              href="/usuarios"
+              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Usuarios
+            </a>
+            <a
+              href="/roles"
+              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Roles
+            </a>
             <span className="text-sm text-gray-700">Hola, {user?.username || 'Usuario'}</span>
             <button
               onClick={onLogout}

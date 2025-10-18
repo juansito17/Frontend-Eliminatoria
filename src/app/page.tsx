@@ -18,7 +18,7 @@ export default function HomePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </div>
-              <span className="text-xl font-bold text-gray-900">AgroTech</span>
+              <span className="text-xl font-bold text-gray-900">AgroNexo</span>
             </div>
 
             <div className="hidden md:flex items-center space-x-8">
@@ -381,7 +381,7 @@ export default function HomePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                   </svg>
                 </div>
-                <span className="text-xl font-bold">AgroTech</span>
+                <span className="text-xl font-bold">AgroNexo</span>
               </div>
               <p className="text-gray-400 mb-4">
                 Sistema inteligente de monitoreo y gestión agrícola desarrollado para el Hackathon 2.0 de agricultura de precisión.
@@ -409,7 +409,7 @@ export default function HomePage() {
           </div>
 
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 AgroTech - Hackathon 2.0. Todos los derechos reservados.</p>
+            <p>&copy; 2025 AgroNexo - Hackathon 2.0. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>

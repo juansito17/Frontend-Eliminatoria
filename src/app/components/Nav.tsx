@@ -18,7 +18,7 @@ export default function Nav() {
               </svg>
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-gray-900">AgroTech</h1>
+              <h1 className="text-lg font-semibold text-gray-900">AgroNexo</h1>
               <p className="text-xs text-gray-500">Sistema Agrícola Inteligente</p>
             </div>
           </div>
