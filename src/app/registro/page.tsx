@@ -9,9 +9,7 @@ export default function RegistroPage() {
     username: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    nombre: '',
-    apellido: ''
+    confirmPassword: ''
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -54,9 +52,7 @@ export default function RegistroPage() {
         body: JSON.stringify({
           username: formData.username,
           email: formData.email,
-          password: formData.password,
-          nombre: formData.nombre,
-          apellido: formData.apellido
+          password: formData.password
         }),
       });
 
@@ -122,37 +118,7 @@ export default function RegistroPage() {
         {/* Form Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nombre
-                </label>
-                <input
-                  type="text"
-                  name="nombre"
-                  value={formData.nombre}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900 placeholder-gray-500"
-                  placeholder="Tu nombre"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Apellido
-                </label>
-                <input
-                  type="text"
-                  name="apellido"
-                  value={formData.apellido}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900 placeholder-gray-500"
-                  placeholder="Tu apellido"
-                  required
-                />
-              </div>
-            </div>
+              
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

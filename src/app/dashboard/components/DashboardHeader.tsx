@@ -2,14 +2,17 @@
 
 import React from 'react';
 
+
 interface Props {
-  user?: { username?: string | null } | null;
+  user?: { username?: string | null; rol?: number | null } | null;
   onLogout: () => void;
+  className?: string;
 }
 
-export default function DashboardHeader({ user, onLogout }: Props) {
+export default function DashboardHeader({ user, onLogout, className }: Props) {
+  const rol = user?.rol;
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header className={`bg-white shadow-sm border-b border-gray-200 ${className || ''}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-6">
           <div className="flex items-center">
@@ -24,38 +27,38 @@ export default function DashboardHeader({ user, onLogout }: Props) {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <a
-              href="/cultivos"
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Gestión de Cultivos
-            </a>
-            <a
-              href="/labores-agricolas"
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Gestión de Labores
-            </a>
-            <a
-              href="/alertas"
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Alertas
-            </a>
-
-            {/* Botones de administración */}
-            <a
-              href="/usuarios"
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Usuarios
-            </a>
-            <a
-              href="/roles"
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Roles
-            </a>
+            {/* Admin: todos los accesos */}
+            {rol === 1 && (
+              <>
+                <a href="/dashboard" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Dashboard Global</a>
+                <a href="/usuarios" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Gestión de Usuarios</a>
+                <a href="/roles" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Gestión de Roles</a>
+                <a href="/cultivos" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Cultivos</a>
+                <a href="/lotes" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Lotes</a>
+                <a href="/labores-tipos" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Tipos de Labor</a>
+                <a href="/labores-agricolas" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Labores Agrícolas</a>
+                <a href="/reportes" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Reportes</a>
+                <a href="/alertas" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Alertas</a>
+              </>
+            )}
+            {/* Supervisor: dashboard, labores, reportes, asignaciones, alertas */}
+            {rol === 2 && (
+              <>
+                <a href="/dashboard" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Dashboard</a>
+                <a href="/labores-agricolas" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Labores Agrícolas</a>
+                <a href="/reportes" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Reportes</a>
+                <a href="/asignaciones" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Asignar Labores/Lotes</a>
+                <a href="/alertas" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Alertas</a>
+              </>
+            )}
+            {/* Operario: solo registro y consulta de labores propias, notificaciones personales */}
+            {rol === 3 && (
+              <>
+                <a href="/registro-labor" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Registrar Labor</a>
+                <a href="/mis-labores" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Mis Labores</a>
+                <a href="/alertas" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Notificaciones</a>
+              </>
+            )}
             <span className="text-sm text-gray-700">Hola, {user?.username || 'Usuario'}</span>
             <button
               onClick={onLogout}

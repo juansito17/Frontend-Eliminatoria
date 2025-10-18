@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import ProtectedRoute from '../components/ProtectedRoute';
+import DashboardLayout from '../DashboardLayout';
 import { useAuth } from '../context/AuthContext';
 import { useUsuarios, useRoles } from '../hooks/useUsuariosRoles';
 import { useToast } from '../components/Toast';
@@ -28,8 +29,6 @@ function UsuariosContent() {
   const [editing, setEditing] = useState<any | null>(null);
   const [form, setForm] = useState<UsuarioForm>({
     username: '',
-    nombre: '',
-    apellido: '',
     email: '',
     password: '',
     rol: 3,
@@ -50,8 +49,6 @@ function UsuariosContent() {
     setEditing(null);
     setForm({
       username: '',
-      nombre: '',
-      apellido: '',
       email: '',
       password: '',
       rol: 3,
@@ -62,10 +59,11 @@ function UsuariosContent() {
 
   const openEdit = (u: any) => {
     setEditing(u);
+    // Evitar poblar el username con el email: si username contiene '@' lo ignoramos
+    const candidateUsername = u.nombre_usuario || u.username || '';
+    const safeUsername = candidateUsername && candidateUsername.includes('@') ? (u.nombre_usuario || '') : candidateUsername;
     setForm({
-      username: u.username || '',
-      nombre: u.nombre || '',
-      apellido: u.apellido || '',
+      username: safeUsername || '',
       email: u.email || '',
       password: '',
       rol: u.rol || 3,
@@ -79,7 +77,6 @@ function UsuariosContent() {
     setIsSubmitting(true);
     try {
       const payload: any = {
-        nombre: form.username,
         nombre_usuario: form.username,
         email: form.email,
         id_rol: form.rol,
@@ -274,14 +271,24 @@ function UsuariosContent() {
 <input id="username" value={form.username} onChange={(e) => setForm({...form, username: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="usuario" required />
               </div>
 
-              <div className="mb-4 grid md:grid-cols-2 gap-4">
-<input placeholder="Nombre" value={form.nombre} onChange={(e) => setForm({...form, nombre: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500" />
-<input placeholder="Apellido" value={form.apellido} onChange={(e) => setForm({...form, apellido: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500" />
-              </div>
+              
 
               <div className="mb-4 grid md:grid-cols-2 gap-4">
-<input placeholder="Email" type="email" value={form.email} onChange={(e) => setForm({...form, email: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500" />
-<input placeholder={editing ? 'Dejar en blanco para mantener contraseña' : 'Contraseña'} type="password" value={form.password} onChange={(e) => setForm({...form, password: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+<input
+  placeholder="Email"
+  type="email"
+  value={form.email}
+  onChange={(e) => setForm({ ...form, email: e.target.value })}
+  disabled={!!editing}
+  className={`w-full px-3 py-2 border border-gray-300 rounded-lg ${editing ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'} text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500`}
+ />
+<input
+  placeholder={editing ? 'Dejar en blanco' : 'Contraseña'}
+  type="password"
+  value={form.password}
+  onChange={(e) => setForm({ ...form, password: e.target.value })}
+  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+/>
               </div>
 
               <div className="mb-4 grid md:grid-cols-2 gap-4">
@@ -313,7 +320,9 @@ function UsuariosContent() {
 export default function UsuariosPage() {
   return (
     <ProtectedRoute>
-      <UsuariosContent />
+      <DashboardLayout>
+        <UsuariosContent />
+      </DashboardLayout>
     </ProtectedRoute>
   );
 }

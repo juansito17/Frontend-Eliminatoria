@@ -757,10 +757,15 @@ function ReportesContent() {
   );
 }
 
+
+import DashboardLayout from '../DashboardLayout';
+
 export default function ReportesPage() {
   return (
     <ProtectedRoute>
-      <ReportesContent />
+      <DashboardLayout>
+        <ReportesContent />
+      </DashboardLayout>
     </ProtectedRoute>
   );
 }

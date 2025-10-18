@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import io, { Socket } from 'socket.io-client';
 import ProtectedRoute from '../components/ProtectedRoute';
 import { useAuth } from '../context/AuthContext';
+import DashboardLayout from '../DashboardLayout';
 
 interface Alerta {
   id: number;
@@ -475,7 +476,9 @@ function AlertasContent() {
 function AlertasPage() {
   return (
     <ProtectedRoute>
-      <AlertasContent />
+      <DashboardLayout>
+        <AlertasContent />
+      </DashboardLayout>
     </ProtectedRoute>
   );
 }

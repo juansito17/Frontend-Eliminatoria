@@ -7,7 +7,7 @@ interface LaboresTableProps {
   labores: LaborAgricola[];
   isLoading: boolean;
   onEdit: (labor: LaborAgricola) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: number) => Promise<void> | void;
   currentUser: User | null; // Añadir currentUser a las props
 }
 

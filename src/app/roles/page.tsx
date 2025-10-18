@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import ProtectedRoute from '../components/ProtectedRoute';
+import DashboardLayout from '../DashboardLayout';
 import { useAuth } from '../context/AuthContext';
 import { useRoles } from '../hooks/useUsuariosRoles';
 import { useToast } from '../components/Toast';
@@ -252,10 +253,12 @@ function RolesContent() {
   );
 }
 
-export default function RolesPage() {
+export default function Page() {
   return (
     <ProtectedRoute>
-      <RolesContent />
+      <DashboardLayout>
+        <RolesContent />
+      </DashboardLayout>
     </ProtectedRoute>
   );
 }
