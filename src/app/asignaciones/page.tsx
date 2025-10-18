@@ -14,12 +14,22 @@ interface Labor { id: number; fecha: string; trabajador: string; tipoLabor: stri
 
 export default function AsignacionesPage() {
   return (
-    <ProtectedRoute roles={[1,2]}>
+    <ProtectedRoute roles={[1]}>
       <DashboardLayout>
-        <AsignacionesContent />
+        <RedirectToAdminAssign />
       </DashboardLayout>
     </ProtectedRoute>
   );
+}
+
+function RedirectToAdminAssign() {
+  const { token } = useAuth();
+  useEffect(() => {
+    if (!token) return;
+    // Redirigimos a la nueva página de solo admin
+    window.location.replace('/asignar-supervisores');
+  }, [token]);
+  return <div className="text-sm text-gray-600">Redirigiendo…</div>;
 }
 
 function AsignacionesContent() {
@@ -27,7 +37,8 @@ function AsignacionesContent() {
   const { showToast } = useToast();
   const confirm = useConfirm();
 
-  const [tab, setTab] = useState<'lotes'|'labores'>('lotes');
+  // Si el usuario no es admin, por defecto mostrar "labores"
+  const [tab, setTab] = useState<'lotes'|'labores'>(user?.rol === 1 ? 'lotes' : 'labores');
 
   const [loading, setLoading] = useState(false);
   const [lotes, setLotes] = useState<Lote[]>([]);
@@ -98,7 +109,8 @@ function AsignacionesContent() {
   async function handleAsignarSupervisor(loteId: number, id_supervisor: number | null) {
     try {
       setLoading(true);
-      const res = await fetch(`/api/lotes/${loteId}`, {
+      // Usamos el endpoint específico para asignar supervisor (solo admin)
+      const res = await fetch(`/api/lotes/${loteId}/supervisor`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', ...authHeader },
         body: JSON.stringify({ id_supervisor })
@@ -156,16 +168,18 @@ function AsignacionesContent() {
 
       <div className="border-b border-gray-200 mb-6">
         <div className="flex gap-2">
-          <button 
-            onClick={() => setTab('lotes')} 
-            className={`px-6 py-3 text-sm font-medium transition-colors ${
-              tab==='lotes' 
-                ? 'text-blue-600 border-b-2 border-blue-600' 
-                : 'text-gray-600 hover:text-gray-900 hover:border-b-2 hover:border-gray-300'
-            }`}
-          >
-            Lotes
-          </button>
+          {user?.rol === 1 && (
+            <button 
+              onClick={() => setTab('lotes')} 
+              className={`px-6 py-3 text-sm font-medium transition-colors ${
+                tab==='lotes' 
+                  ? 'text-blue-600 border-b-2 border-blue-600' 
+                  : 'text-gray-600 hover:text-gray-900 hover:border-b-2 hover:border-gray-300'
+              }`}
+            >
+              Lotes
+            </button>
+          )}
           <button 
             onClick={() => setTab('labores')} 
             className={`px-6 py-3 text-sm font-medium transition-colors ${
@@ -179,7 +193,7 @@ function AsignacionesContent() {
         </div>
       </div>
 
-      {tab === 'lotes' && (
+      {tab === 'lotes' && user?.rol === 1 && (
         <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="p-4 bg-gray-50 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Supervisores por Lote</h2>
@@ -327,8 +341,8 @@ function AsignacionesContent() {
         </section>
       )}
 
-      {/* Modal para agregar asignación */}
-      {showModal && (
+      {/* Modal para agregar asignación (solo Admin) */}
+      {showModal && user?.rol === 1 && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-lg">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Agregar Asignación</h3>
@@ -340,7 +354,7 @@ function AsignacionesContent() {
               }
               try {
                 setLoading(true);
-                const res = await fetch(`/api/lotes/${formData.id_lote}`, {
+                const res = await fetch(`/api/lotes/${formData.id_lote}/supervisor`, {
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json', ...authHeader },
                   body: JSON.stringify({ id_supervisor: parseInt(formData.id_supervisor, 10) })
