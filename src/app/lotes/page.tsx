@@ -23,6 +23,7 @@ export default function LotesPage() {
   const { cultivos } = useCultivos();
 
   const [lotes, setLotes] = useState<Lote[]>([]);
+  const [supervisores, setSupervisores] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Lote | null>(null);
@@ -30,6 +31,7 @@ export default function LotesPage() {
     nombre: '',
     area: '',
     id_cultivo: '',
+    id_supervisor: ''
   });
 
   const loadLotes = async () => {
@@ -54,14 +56,33 @@ export default function LotesPage() {
     }
   };
 
+  // Cargar supervisores (filtramos usuarios con rol === 2)
+  const loadSupervisores = async () => {
+    try {
+      const res = await fetch('/api/usuarios', {
+        headers: {
+          Authorization: `Bearer ${token || ''}`,
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const users = data.usuarios || data || [];
+        setSupervisores(users.filter((u: any) => u.rol === 2));
+      }
+    } catch (err) {
+      console.error('Error cargando supervisores:', err);
+    }
+  };
+
   useEffect(() => {
     loadLotes();
+    loadSupervisores();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const openCreate = () => {
     setEditing(null);
-    setForm({ nombre: '', area: '', id_cultivo: '' });
+    setForm({ nombre: '', area: '', id_cultivo: '', id_supervisor: '' });
     setShowModal(true);
   };
 
@@ -71,6 +92,7 @@ export default function LotesPage() {
       nombre: l.nombre || '',
       area: l.area != null ? String(l.area) : '',
       id_cultivo: l.id_cultivo ? String(l.id_cultivo) : '',
+      id_supervisor: (l as any).id_supervisor ? String((l as any).id_supervisor) : ''
     });
     setShowModal(true);
   };
@@ -83,6 +105,7 @@ export default function LotesPage() {
         nombre: form.nombre,
         area: form.area ? parseFloat(form.area) : null,
         id_cultivo: form.id_cultivo ? parseInt(form.id_cultivo, 10) : null,
+        id_supervisor: form.id_supervisor ? parseInt(form.id_supervisor, 10) : null,
       };
 
       const url = editing ? `/api/lotes/${editing.id}` : '/api/lotes';
@@ -209,6 +232,16 @@ export default function LotesPage() {
                     <option value="">-- Ninguno --</option>
                     {cultivos.map(c => (
                       <option key={c.id} value={String(c.id)}>{c.nombre}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-sm text-gray-600 block mb-2">Asignar Supervisor (opcional)</label>
+                  <select value={form.id_supervisor} onChange={(e) => setForm({ ...form, id_supervisor: e.target.value })} className="w-full px-3 py-2 border rounded-md">
+                    <option value="">-- Ninguno --</option>
+                    {supervisores.map(s => (
+                      <option key={s.id} value={String(s.id)}>{s.username || s.nombre_usuario || s.email}</option>
                     ))}
                   </select>
                 </div>
