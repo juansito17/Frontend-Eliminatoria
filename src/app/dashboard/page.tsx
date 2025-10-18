@@ -2,7 +2,7 @@
 
 import { useAuth } from '../context/AuthContext';
 import ProtectedRoute from '../components/ProtectedRoute';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import io from 'socket.io-client';
 import { Line } from 'react-chartjs-2';
 import {
@@ -60,61 +60,62 @@ function DashboardContent() {
   const [dateFrom, setDateFrom] = useState<string>('');
   const [dateTo, setDateTo] = useState<string>('');
 
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/dashboard');
+      if (!response.ok) {
+        throw new Error('Error al obtener los datos del dashboard');
+      }
+      const data = await response.json();
+      setDashboardData(data);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchHistoricalData = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/dashboard/historical?periodo=${selectedPeriod}`);
+      if (!response.ok) {
+        throw new Error('Error al obtener datos históricos');
+      }
+      const data = await response.json();
+      setHistoricalData(data);
+    } catch (err: any) {
+      console.error('Error fetching historical data:', err);
+    }
+  }, [selectedPeriod]);
+
+  // Cargar filtros maestros
+  const fetchCultivos = useCallback(async () => {
+    try {
+      const res = await fetch('/api/cultivos');
+      if (res.ok) {
+        const data = await res.json();
+        setCultivos(data.cultivos || data || []);
+      }
+    } catch (err) {
+      console.error('Error cargando cultivos:', err);
+    }
+  }, []);
+
+  const fetchLotes = useCallback(async () => {
+    try {
+      const res = await fetch('/api/lotes');
+      if (res.ok) {
+        const data = await res.json();
+        setLotes(data.lotes || data || []);
+      }
+    } catch (err) {
+      console.error('Error cargando lotes:', err);
+    }
+  }, []);
+
+  const socketRef = useRef<any | null>(null);
+
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const response = await fetch('/api/dashboard');
-        if (!response.ok) {
-          throw new Error('Error al obtener los datos del dashboard');
-        }
-        const data = await response.json();
-        setDashboardData(data);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchHistoricalData = async () => {
-      try {
-        const response = await fetch(`/api/dashboard/historical?periodo=${selectedPeriod}`);
-        if (!response.ok) {
-          throw new Error('Error al obtener datos históricos');
-        }
-        const data = await response.json();
-        setHistoricalData(data);
-      } catch (err: any) {
-        console.error('Error fetching historical data:', err);
-        // setError(err.message); // Podrías manejar este error por separado si quieres
-      }
-    };
-
-    // Cargar filtros maestros
-    const fetchCultivos = async () => {
-      try {
-        const res = await fetch('/api/cultivos');
-        if (res.ok) {
-          const data = await res.json();
-          setCultivos(data.cultivos || data || []);
-        }
-      } catch (err) {
-        console.error('Error cargando cultivos:', err);
-      }
-    };
-
-    const fetchLotes = async () => {
-      try {
-        const res = await fetch('/api/lotes');
-        if (res.ok) {
-          const data = await res.json();
-          setLotes(data.lotes || data || []);
-        }
-      } catch (err) {
-        console.error('Error cargando lotes:', err);
-      }
-    };
-
     fetchDashboardData();
     fetchHistoricalData();
     fetchCultivos();
@@ -122,6 +123,7 @@ function DashboardContent() {
 
     // Socket.io connection for real-time updates
     const socket = io(process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3001');
+    socketRef.current = socket;
 
     socket.on('connect', () => {
       console.log('Conectado al servidor de Socket.io');
@@ -147,14 +149,21 @@ function DashboardContent() {
       setAlerts((prevAlerts) => [...prevAlerts, newAlert]);
     });
 
+    // Polling fallback: si socket falla, refrescar cada 30s
+    const polling = setInterval(() => {
+      fetchDashboardData();
+    }, 30000);
+
     socket.on('disconnect', () => {
       console.log('Desconectado del servidor de Socket.io');
     });
 
     return () => {
+      clearInterval(polling);
       socket.disconnect();
+      socketRef.current = null;
     };
-  }, [selectedPeriod]); // Dependencia para recargar datos históricos cuando cambie el período
+  }, [fetchDashboardData, fetchHistoricalData, fetchCultivos, fetchLotes]);
 
   const handleLogout = () => {
     logout();
