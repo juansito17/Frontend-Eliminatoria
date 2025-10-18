@@ -2,6 +2,7 @@
 
 import { useAuth } from '../context/AuthContext';
 import ProtectedRoute from '../components/ProtectedRoute';
+import Cookies from 'js-cookie';
 import React, { useEffect, useState } from 'react';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import {
@@ -328,6 +329,56 @@ function ReportesContent() {
     }));
   };
 
+  const handleExport = async (type: 'pdf' | 'excel') => {
+    // fallback to cookie token if context token is null
+    const cookieToken = Cookies.get('token');
+    const authToken = token || cookieToken;
+
+    if (!authToken) {
+      alert('No autorizado: inicia sesión para exportar.');
+      return;
+    }
+
+    try {
+      const params = new URLSearchParams({
+        fechaInicio: filtros.fechaInicio,
+        fechaFin: filtros.fechaFin,
+        cultivoId: filtros.cultivoId,
+        laborId: filtros.laborId,
+        trabajadorId: filtros.trabajadorId
+      });
+
+      const url = `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/reportes/labores/${type}?${params.toString()}`;
+
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null);
+        const msg = errData?.message || 'Error al generar exportación';
+        alert(msg);
+        return;
+      }
+
+      const blob = await res.blob();
+      const filename = type === 'pdf' ? `reportes_${Date.now()}.pdf` : `reportes_${Date.now()}.xlsx`;
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      console.error('Error exportando:', err);
+      alert('Error al exportar. Revisa la consola para más detalles.');
+    }
+  };
+
   // Datos para gráficos
   const produccionDiariaChartData = {
     labels: produccionDiaria.map(item => new Date(item.fecha).toLocaleDateString()),
@@ -592,34 +643,20 @@ function ReportesContent() {
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-900">Datos Detallados</h3>
             <div className="flex space-x-2">
-              <a
-                href={`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/reportes/labores/pdf?${new URLSearchParams({
-                  fechaInicio: filtros.fechaInicio,
-                  fechaFin: filtros.fechaFin,
-                  cultivoId: filtros.cultivoId,
-                  laborId: filtros.laborId,
-                  trabajadorId: filtros.trabajadorId
-                })}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() => handleExport('pdf')}
                 className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm font-medium"
               >
                 Exportar PDF
-              </a>
-              <a
-                href={`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/reportes/labores/excel?${new URLSearchParams({
-                  fechaInicio: filtros.fechaInicio,
-                  fechaFin: filtros.fechaFin,
-                  cultivoId: filtros.cultivoId,
-                  laborId: filtros.laborId,
-                  trabajadorId: filtros.trabajadorId
-                })}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              </button>
+              <button
+                type="button"
+                onClick={() => handleExport('excel')}
                 className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium"
               >
                 Exportar Excel
-              </a>
+              </button>
             </div>
           </div>
 
