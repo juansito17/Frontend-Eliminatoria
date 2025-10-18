@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 
 export async function GET(req: NextRequest) {
   try {
@@ -9,8 +10,14 @@ export async function GET(req: NextRequest) {
     const cultivoId = searchParams.get('cultivoId');
     const tipoLaborId = searchParams.get('tipoLaborId');
 
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3000';
-    const token = req.headers.get('authorization')?.replace('Bearer ', '');
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3001';
+    // Intentar obtener token desde Authorization o cookies
+    const authHeader = req.headers.get('authorization');
+    let token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : authHeader || '';
+    if (!token) {
+      const cookieStore = await cookies();
+      token = cookieStore.get('token')?.value || '';
+    }
 
     if (!token) {
       return NextResponse.json({ message: 'Token no proporcionado' }, { status: 401 });
@@ -49,8 +56,14 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3000';
-    const token = req.headers.get('authorization')?.replace('Bearer ', '');
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3001';
+    // Intentar obtener token desde Authorization o cookies
+    const authHeader = req.headers.get('authorization');
+    let token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : authHeader || '';
+    if (!token) {
+      const cookieStore = await cookies();
+      token = cookieStore.get('token')?.value || '';
+    }
 
     if (!token) {
       return NextResponse.json({ message: 'Token no proporcionado' }, { status: 401 });

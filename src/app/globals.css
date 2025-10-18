@@ -26,3 +26,21 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Animaciones al hacer scroll: estado inicial + estado visible */
+.animate-section {
+  opacity: 0;
+  transform: translateY(24px) scale(0.98);
+  transition: opacity 700ms cubic-bezier(.2,.9,.2,1), transform 700ms cubic-bezier(.2,.9,.2,1);
+  will-change: opacity, transform;
+}
+
+.in-view {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Utilidad para delay en elementos hijos (si se desea stagger) */
+.animate-stagger > * {
+  transition-delay: 120ms;
+}

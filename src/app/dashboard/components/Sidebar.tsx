@@ -26,7 +26,7 @@ export default function Sidebar({ rol, username }: SidebarProps) {
   }, [rol]);
   return (
     <aside
-      className={`fixed top-0 left-0 h-screen bg-white shadow-lg z-40 flex flex-col justify-between transition-all duration-300 ${collapsed ? 'w-16' : 'w-64'}`}
+      className={`fixed top-0 left-0 h-screen bg-white shadow-lg z-40 flex flex-col justify-between transition-all duration-300 ${collapsed ? 'w-16' : 'w-64'} hidden sm:flex`}
     >
       <div>
         <div className="flex items-center px-2 py-6 border-b border-gray-200">

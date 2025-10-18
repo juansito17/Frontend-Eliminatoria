@@ -1,10 +1,43 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const elems = document.querySelectorAll<HTMLElement>('[data-animate]');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const el = entry.target as HTMLElement;
+        if (entry.isIntersecting) {
+          if (el.dataset.animate === 'stagger') {
+            // marcar contenedor y sus hijos (stagger)
+            el.classList.add('in-view');
+            el.querySelectorAll<HTMLElement>('*').forEach((child, i) => {
+              child.style.transitionDelay = `${i * 120}ms`;
+              child.classList.add('in-view');
+            });
+          } else {
+            el.classList.add('in-view');
+          }
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    elems.forEach((el) => {
+      if (el.dataset.animate === 'stagger') {
+        el.classList.add('animate-stagger');
+      } else {
+        el.classList.add('animate-section');
+      }
+      observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-100">
@@ -60,7 +93,7 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <section id="inicio" className="relative py-20 px-4 sm:px-6 lg:px-8">
+      <section id="inicio" className="relative py-20 px-4 sm:px-6 lg:px-8" data-animate>
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium mb-8">
@@ -93,7 +126,7 @@ export default function HomePage() {
       </section>
 
       {/* Problem & Solution Section */}
-      <section id="solucion" className="py-20 bg-white">
+      <section id="solucion" className="py-20 bg-white" data-animate>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -156,7 +189,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section id="caracteristicas" className="py-20 bg-gray-50">
+      <section id="caracteristicas" className="py-20 bg-gray-50" data-animate>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Características del Sistema</h2>
@@ -165,7 +198,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8" data-animate="stagger">
             <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-6">
                 <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -248,7 +281,7 @@ export default function HomePage() {
       </section>
 
       {/* Technology Section */}
-      <section id="tecnologia" className="py-20 bg-white">
+      <section id="tecnologia" className="py-20 bg-white" data-animate>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Tecnología de Vanguardia</h2>
@@ -294,7 +327,7 @@ export default function HomePage() {
       </section>
 
       {/* Team Section */}
-      <section id="equipo" className="py-20 bg-gray-50">
+      <section id="equipo" className="py-20 bg-gray-50" data-animate>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Sobre el Proyecto</h2>
@@ -351,7 +384,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-green-600">
+      <section className="py-20 bg-green-600" data-animate>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-6">
             ¿Listo para revolucionar tu gestión agrícola?

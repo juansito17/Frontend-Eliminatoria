@@ -5,6 +5,7 @@ import io, { Socket } from 'socket.io-client';
 import ProtectedRoute from '../components/ProtectedRoute';
 import { useAuth } from '../context/AuthContext';
 import DashboardLayout from '../DashboardLayout';
+import { useToast } from '../components/Toast';
 
 interface Alerta {
   id: number;
@@ -19,6 +20,7 @@ interface Alerta {
 
 function AlertasContent() {
   const { user, logout } = useAuth();
+  const { showToast } = useToast();
   const [alertas, setAlertas] = useState<Alerta[]>([]);
   const [alertasFiltradas, setAlertasFiltradas] = useState<Alerta[]>([]);
   const [filtroTipo, setFiltroTipo] = useState<string>('todos');
@@ -128,14 +130,16 @@ function AlertasContent() {
       if (response.ok) {
         // Actualización optimista por si el evento de WebSocket se pierde
         setAlertas((prev) => prev.map((a) => (a.id === id ? { ...a, resuelta: true } : a)));
-        console.log('Alerta marcada como resuelta');
+        showToast('Alerta marcada como resuelta', 'success');
         // Re-fetch para asegurar coherencia total con el backend
         fetchAlertas();
       } else {
         console.error('Error al actualizar alerta:', response.statusText);
+        showToast('Error al actualizar la alerta', 'error');
       }
     } catch (error) {
       console.error('Error de conexión:', error);
+      showToast('Error de conexión al actualizar', 'error');
     }
   };
 
@@ -154,14 +158,16 @@ function AlertasContent() {
       if (response.ok) {
         // Eliminación optimista por si el evento de WebSocket se pierde
         setAlertas((prev) => prev.filter((a) => a.id !== id));
-        console.log('Alerta eliminada');
+        showToast('Alerta eliminada', 'success');
         // Re-fetch para asegurar coherencia total con el backend
         fetchAlertas();
       } else {
         console.error('Error al eliminar alerta:', response.statusText);
+        showToast('Error al eliminar la alerta', 'error');
       }
     } catch (error) {
       console.error('Error de conexión:', error);
+      showToast('Error de conexión al eliminar', 'error');
     }
   };
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 
 export async function PUT(
   req: NextRequest,
@@ -6,8 +7,12 @@ export async function PUT(
 ) {
   try {
     const body = await req.json();
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3000';
-    const token = req.headers.get('authorization')?.replace('Bearer ', '');
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3001';
+    let token = req.headers.get('authorization')?.replace('Bearer ', '') || '';
+    if (!token) {
+      const cookieStore = await cookies();
+      token = cookieStore.get('token')?.value || '';
+    }
 
     if (!token) {
       return NextResponse.json({ message: 'Token no proporcionado' }, { status: 401 });
@@ -40,8 +45,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3000';
-    const token = req.headers.get('authorization')?.replace('Bearer ', '');
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3001';
+    let token = req.headers.get('authorization')?.replace('Bearer ', '') || '';
+    if (!token) {
+      const cookieStore = await cookies();
+      token = cookieStore.get('token')?.value || '';
+    }
 
     if (!token) {
       return NextResponse.json({ message: 'Token no proporcionado' }, { status: 401 });

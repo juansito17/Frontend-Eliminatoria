@@ -171,10 +171,10 @@ function DashboardContent() {
   }
 
   return (
-    <>
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">¡Bienvenido de vuelta!</h2>
-        <p className="text-lg text-gray-600">Aquí tienes un resumen de tu actividad agrícola</p>
+    <div className="px-2 sm:px-4 md:px-8 lg:px-0 w-full max-w-7xl mx-auto">
+      <div className="mb-6 md:mb-8">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2">¡Bienvenido de vuelta!</h2>
+        <p className="text-base sm:text-lg text-gray-600">Aquí tienes un resumen de tu actividad agrícola</p>
       </div>
 
       <StatsCards dashboardData={dashboardData} />
@@ -190,6 +190,6 @@ function DashboardContent() {
       <AlertsList alerts={alerts} />
 
       <QuickActions />
-    </>
+    </div>
   );
 }
