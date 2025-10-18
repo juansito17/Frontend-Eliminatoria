@@ -1,11 +1,9 @@
 'use client';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useAuth } from '../context/AuthContext';
 import ProtectedRoute from '../components/ProtectedRoute';
 import io from 'socket.io-client';
 import StatsCards from './components/StatsCards';
-import Sidebar from './components/Sidebar';
 import {
   DashboardData as DashboardDataType,
   HistoricalData,
@@ -15,17 +13,19 @@ import {
   AlertsList,
   QuickActions,
 } from './components/DashboardParts';
+import DashboardLayout from '../DashboardLayout';
 
 export default function DashboardPage() {
   return (
     <ProtectedRoute>
-      <DashboardContent />
+      <DashboardLayout>
+        <DashboardContent />
+      </DashboardLayout>
     </ProtectedRoute>
   );
 }
 
 function DashboardContent() {
-  const { user, logout } = useAuth();
 
   const [dashboardData, setDashboardData] = useState<DashboardDataType | null>(null);
   const [historicalData, setHistoricalData] = useState<HistoricalData[]>([]);
@@ -162,10 +162,8 @@ function DashboardContent() {
     };
   }, [fetchDashboardData, fetchHistoricalData, fetchCultivos, fetchLotes, fetchAlertas]);
 
-  const handleLogout = () => logout();
-
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Cargando dashboard...</div>;
+    return <div className="flex items-center justify-center">Cargando dashboard...</div>;
   }
 
   if (error) {
@@ -173,30 +171,25 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <Sidebar rol={user?.rol} username={user?.username} />
-      <div className="ml-16 md:ml-64">
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">¡Bienvenido de vuelta!</h2>
-            <p className="text-lg text-gray-600">Aquí tienes un resumen de tu actividad agrícola</p>
-          </div>
-
-          <StatsCards dashboardData={dashboardData} />
-
-          <RendimientoTable rendimiento={dashboardData?.rendimiento_por_lote as RendimientoItem[] | undefined} />
-
-          <HistoricalChart
-            historicalData={historicalData}
-            selectedPeriod={selectedPeriod}
-            onPeriodChange={(p) => setSelectedPeriod(p)}
-          />
-
-          <AlertsList alerts={alerts} />
-
-          <QuickActions />
-        </main>
+    <>
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">¡Bienvenido de vuelta!</h2>
+        <p className="text-lg text-gray-600">Aquí tienes un resumen de tu actividad agrícola</p>
       </div>
-    </div>
+
+      <StatsCards dashboardData={dashboardData} />
+
+      <RendimientoTable rendimiento={dashboardData?.rendimiento_por_lote as RendimientoItem[] | undefined} />
+
+      <HistoricalChart
+        historicalData={historicalData}
+        selectedPeriod={selectedPeriod}
+        onPeriodChange={(p) => setSelectedPeriod(p)}
+      />
+
+      <AlertsList alerts={alerts} />
+
+      <QuickActions />
+    </>
   );
 }
