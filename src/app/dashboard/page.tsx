@@ -125,12 +125,22 @@ function DashboardContent() {
     logout();
   };
 
+  const formatPeriodo = (p: string) => {
+    // Formatea periodos ISO a fecha local legible; deja intacto otros formatos (e.g. "2025-W41")
+    if (!p) return p;
+    if (/\d{4}-\d{2}-\d{2}T/.test(p)) {
+      const d = new Date(p);
+      if (!isNaN(d.getTime())) return d.toLocaleDateString();
+    }
+    return p;
+  };
+
   const chartData = {
-    labels: historicalData.map((data) => data.periodo),
+    labels: historicalData.map((data) => formatPeriodo(String(data.periodo))),
     datasets: [
       {
         label: 'Producción Total (kg)',
-        data: historicalData.map((data) => data.total_peso_kg),
+        data: historicalData.map((data) => Number(data.total_peso_kg) || 0),
         borderColor: 'rgb(75, 192, 192)',
         tension: 0.1,
       },
