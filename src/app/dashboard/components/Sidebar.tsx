@@ -77,7 +77,7 @@ export default function Sidebar({ rol, username }: SidebarProps) {
               <SidebarLink href="/dashboard" label="Dashboard" collapsed={collapsed} />
               <SidebarLink href="/labores-agricolas" label="Labores Agrícolas" collapsed={collapsed} />
               <SidebarLink href="/reportes" label="Reportes" collapsed={collapsed} />
-              <SidebarLink href="/reasignar-labores" label="Reasignar Labores" collapsed={collapsed} />
+              {/* <SidebarLink href="/reasignar-labores" label="Reasignar Labores" collapsed={collapsed} /> */}
               <SidebarLink href="/alertas" label="Alertas" collapsed={collapsed} />
             </>
           )}
